@@ -145,11 +145,11 @@ int main(){
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
-    double L_delta_g_bb[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
-    double L_delta_g_k[] = {0, 2,4,6,8,10};
+    double L_delta_g_bb[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
+    double L_delta_g_k[] = {0, 2, 4, 6, 8, 10};
 
     // define template string
-    std::vector<int> mRNA_template = template_string(length_mRNA);
+    // std::vector<int> mRNA_template = template_string(length_mRNA);
 
     //loop over different g_r = g_w and g_bb
     for (double delta_g_bb : L_delta_g_bb) {
@@ -399,7 +399,7 @@ int main(){
         int rounded_delta_g_k = round(delta_g_k);
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
-        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221006output/";
+        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221007output/";
         string filename_output = path + date_now + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_k_" + std::to_string(rounded_delta_g_k) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
 

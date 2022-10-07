@@ -24,9 +24,9 @@ for delta_g_k in L_delta_g_k:
     L_epsilon = []
     L_delta_g_bb_graph = []
     for delta_g_bb in L_delta_g_bb:
-        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/221005output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
+        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221005output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
         if file_exists == True:
-            data = pd.read_csv('/home/ipausers/louman/Documents/programming/221005output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
+            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221005output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
             print(data)
             epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
             L_epsilon.append(epsilon)

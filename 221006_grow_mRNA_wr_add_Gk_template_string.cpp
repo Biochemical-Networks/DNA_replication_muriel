@@ -399,7 +399,7 @@ int main(){
         int rounded_delta_g_k = round(delta_g_k);
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
-        string path = "/home/ipausers/louman/Documents/programming/221005output/";
+        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221006output/";
         string filename_output = path + date_now + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_k_" + std::to_string(rounded_delta_g_k) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
 

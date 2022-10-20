@@ -134,7 +134,7 @@ int main(){
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
     double L_delta_g_bb[] = {0};//{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
-    double L_delta_g_k[] = {10}; //{0, 2,4,6,8,10};
+    double L_delta_g_k[] = {0}; //{0, 2,4,6,8,10};
     
     //loop over different g_r = g_w and g_bb
     for (double delta_g_bb : L_delta_g_bb) {
@@ -147,8 +147,8 @@ int main(){
             double a_2w = a_2rw_func(k_on, w_con, delta_g_k);
             double b_1 = b_1_func(k_bb, delta_g_bb);
             double b_2 = b_2_func(k_bb);
-            double c_1r = c_1rw_func(k_on,r_con_star);
-            double c_1w = c_1rw_func(k_on,w_con_star);
+            double c_1r = c_1rw_func(k_on, r_con_star);
+            double c_1w = c_1rw_func(k_on, w_con_star);
             double c_2r = c_2rw_func(k_on, delta_g_r);
             double c_2w = c_2rw_func(k_on, delta_g_w);
 

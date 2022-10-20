@@ -20,6 +20,8 @@ typedef struct {
 // define needed free energies and concentrations dependent on template en mRNA binding
 variable_definition_t def_variables_given_ij(int i,int j, double G_bb, double G_k){
     variable_definition_t variable_definition;
+    
+    // G_bb = 0;
     if(i ==0 && j==0){
         variable_definition.concentration = 1;
         variable_definition.concentration_star= 1.5;
@@ -73,12 +75,12 @@ double b_1(double k_bb, int j_M, int j_M1, double G_bb, double G_k){
 
 double c_2(double k_on, int i, int j, double G_bb, double G_k){
     variable_definition_t variables = def_variables_given_ij(i,j,G_bb, G_k);
-    return k_on * variables.concentration_star;
-}
+    return k_on * exp(-1 * variables.delta_G);
+    }
 
 double c_1(double k_on, int i, int j, double G_bb, double G_k){
     variable_definition_t variables = def_variables_given_ij(i,j,G_bb, G_k);
-    return k_on * exp(-1 * variables.delta_G);
+    return k_on * variables.concentration_star;
 }
 
 
@@ -150,7 +152,7 @@ std::vector<int> template_string(int string_length){
     std::vector<int> string;
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
-    for(int j; j<string_length; j++){
+    for(int j=0; j<string_length; j++){
         double random_number = distribution(generator);
         int rounded_random_number = round(random_number);
         string.push_back(rounded_random_number);
@@ -183,7 +185,6 @@ int main(){
     double L_delta_g_k[] = {0, 2, 4, 6, 8, 10};
 
     // define template string
-    std::cout<< "hello"<<std::endl;
     std::vector<int> mRNA_template = template_string(length_mRNA +1);
     
     
@@ -191,8 +192,7 @@ int main(){
     for (double delta_g_bb : L_delta_g_bb) {
         for (double delta_g_k : L_delta_g_k) {
             //error vector with -5 is incorrect, 5 is correct
-            std::vector<int> mRNA_error(length_mRNA);
-            
+            std::vector<int> mRNA_error(length_mRNA,0);
             std::vector<int> mRNA_string;
             mRNA_string.push_back(0);
             std::vector<int> mRNA_string_states_length;
@@ -240,17 +240,19 @@ int main(){
                     }
                 }
                 else{
-                // define probabilities needed for going to t1 or t2
-                double alpha_2_add_0 = a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
-                double alpha_2_add_1 = a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
-                double gamma_1 = c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
+                    // define probabilities needed for going to t1 or t2
+                    double alpha_2_add_0 = a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
+                    double alpha_2_add_1 = a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
+                    double gamma_1 = c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
+                    
                     if(random_number1 < alpha_2_add_0){
                         //add a 0 to the mRNA
                         transition_state = -1;
                         mRNA_string_states_length.push_back(transition_state);
                         mRNA_moves[iteration].transition_state = "t1_0";
                     }
-                    else if(random_number1 > alpha_2_add_0 && random_number1 < (alpha_2_add_0 + alpha_2_add_1)){
+
+                    else if(random_number1 < (alpha_2_add_0 + alpha_2_add_1)){
                         //add a 1 to the mRNA
                             transition_state = 1;
                             mRNA_string_states_length.push_back(transition_state);
@@ -284,7 +286,7 @@ int main(){
                 }
                 
                 // if in trasition state 1, adding a 0 to the mRNA string
-                if(transition_state == -1){
+                else if(transition_state == -1){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
                     double beta_2_add_0 = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + b_2(k_bb));
                     double beta_1_add_0 = b_1(k_bb, mRNA_string[i], 0, delta_g_bb, delta_g_k)/(b_1(k_bb, mRNA_string[i], 0, delta_g_bb, delta_g_k) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g_k));
@@ -300,7 +302,7 @@ int main(){
                 }
 
                 // if in trasition state 2, remove a monomer or stay in s(M)
-                if(transition_state == 2){
+                else if(transition_state == 2){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
                     double beta_2_remove = b_2(k_bb)/(a_1(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g_k) + b_2(k_bb));
                     double beta_1_remove = b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g_k)/(b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g_k) + c_2(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));

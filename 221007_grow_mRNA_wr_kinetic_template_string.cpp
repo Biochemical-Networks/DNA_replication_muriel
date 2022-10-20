@@ -193,10 +193,16 @@ int main(){
         for (double delta_g_k : L_delta_g_k) {
             //error vector with -5 is incorrect, 5 is correct
             std::vector<int> mRNA_error(length_mRNA,0);
+
+            // mRNA string we are going to grow, start with a zero on the first place
             std::vector<int> mRNA_string;
-            mRNA_string.push_back(0);
+            mRNA_string.push_back(0); 
+
+            // keep track of the transition states and the length of mRNA trough the code. This is also done in mRNA moves. start with a mRNA length of 1
             std::vector<int> mRNA_string_states_length;
             mRNA_string_states_length.push_back(1);
+
+            //define variables later used in code
             int i = 0;
             int transition_state = 0;
             int iteration = 0;
@@ -204,12 +210,13 @@ int main(){
             
             while(mRNA_string.size()< length_mRNA){
             // for(int j =0;j<20;j++){
-                // Go to transition state 1r or 1w or 2, first MC step
                 // create a random number betwen 0 and 1
                 double random_number1 = distribution(generator);
+
+                // keep track of the current position. S(M)
                 i = mRNA_string.size() -1;
                 
-
+                //define for the current position, S(M) the error.
                 int error_true = error(mRNA_template[i], mRNA_string[i]);
                 mRNA_error[i] = error_true;
             
@@ -223,9 +230,7 @@ int main(){
 
                                        
                 // if string is shorter than 2 monomers, always go add 1(50%) or 0(50%) to the mRNA
-                if(mRNA_string.size() == 1){
-                
-                
+                if(mRNA_string.size() == 1){              
                     if(random_number1 <0.5){
                         //add a 0 to the mRNA
                         transition_state = -1;
@@ -239,6 +244,7 @@ int main(){
                         mRNA_moves[iteration].transition_state = "t1_1";
                     }
                 }
+
                 else{
                     // define probabilities needed for going to t1 or t2
                     double alpha_2_add_0 = a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
@@ -246,27 +252,26 @@ int main(){
                     double gamma_1 = c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k)/(a_2(k_on, mRNA_template[i+1], 0, delta_g_bb, delta_g_k) + a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g_k) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g_k));
                     
                     if(random_number1 < alpha_2_add_0){
-                        //add a 0 to the mRNA
+                        //go to transition state 1, adding a 0 to the mRNA
                         transition_state = -1;
                         mRNA_string_states_length.push_back(transition_state);
                         mRNA_moves[iteration].transition_state = "t1_0";
                     }
 
                     else if(random_number1 < (alpha_2_add_0 + alpha_2_add_1)){
-                        //add a 1 to the mRNA
+                        //go to transition state 1, adding a 1 to the mRNA
                             transition_state = 1;
                             mRNA_string_states_length.push_back(transition_state);
                             mRNA_moves[iteration].transition_state = "t1_1";
                     }
                     else{
+                        //go back to transition state 2
                         transition_state = 2;
                         mRNA_string_states_length.push_back(transition_state);
                         mRNA_moves[iteration].transition_state = "t2";
                     }
                 }
-                
 
-                // std::cout << mRNA_moves[iteration].transition_state <<std::endl;
 
                 double random_number2 = distribution(generator);
                 // if in trasition state 1, adding a 1 to the mRNA string

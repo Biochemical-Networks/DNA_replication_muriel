@@ -1,3 +1,14 @@
+/*
+15-09-22, Muriel Louman, AMOLF
+
+Grow mRNA assuming a template string of only ones, setting the kinetic and temporary thermodynamic free energy to zero.
+Due to the template string existing of only ones, adding a 0 is right and adding a 1 is wrong.
+
+mRNA only consisting of zeros and ones.
+*/
+
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container

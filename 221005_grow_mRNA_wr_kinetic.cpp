@@ -1,3 +1,13 @@
+/* 
+05-10-22, Muriel Louman, AMOLF
+
+Grow mRNA, assumingh template string of only ones. The kinetic case of Jenny's paper. 
+delta G_TT = 0, delta G_k = delta G
+
+mRNA only consisting of zeros and ones.
+*/
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container

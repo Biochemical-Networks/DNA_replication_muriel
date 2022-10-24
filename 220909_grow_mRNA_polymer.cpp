@@ -1,3 +1,11 @@
+/*
+09-09-22, Muriel Louman, AMOLF
+
+Grow a polymer string, without keeping track what you are adding. 
+There is no wrong or right when adding a monomer.
+*/
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container

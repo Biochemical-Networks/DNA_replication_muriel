@@ -1,13 +1,3 @@
-/* 
-07-10-22, Muriel Louman, AMOLF
-
-Grow mRNA, assumingh a randomly distributed template string of zeros and ones. Reproduicing the kinetic case of Jenny's paper. 
-delta G_TT = 0, delta G_k = delta G. 
-
-mRNA only consisting of zeros and ones.
-*/
-
-
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container
@@ -19,7 +9,37 @@ mRNA only consisting of zeros and ones.
 using namespace std;
 
 typedef struct {
+    //define the part of the OH group: does it have a O- or a H at a surtain position.
+    int position_1;
+    int position_2;
+    int position_3;
+    } OH_groups ;
+
+std::vector<int> base_OH_groups(int base){
+    std::vector<int> OH_groups;
+    if(base == 1){
+        //base = 1 means, base is aA.
+        OH_groups = {1, 0, 1};
+    }
+    else if(base == 2){
+        //base = 1 means, base is aA.
+        OH_groups = {0, 1, 0};
+    }
+    else if(base == 3){
+        //base = 1 means, base is aA.
+        OH_groups = {0, 1, 1};
+    }
+    else if(base == 4){
+        //base = 1 means, base is aA.
+        OH_groups = {1, 0, 0};
+    }
+    return OH_groups;
+}
+
+
+typedef struct {
     //typedef gives a way to define the type of struct somewhere without typing struct in front of it
+    // define variables based on how good the match is between the OH groups
     double concentration;
     double concentration_star;
     double delta_G;
@@ -27,33 +47,33 @@ typedef struct {
     double delta_G_k;
     } variable_definition_t ;
 
+int matches(std::vector<int> base_i, std::vector<int> base_j){
+    int match = 0;
+    for(int i=0; i< base_i.size(); ++i){
+        if(base_i[i] != base_j[i]){
+            match += 1;
+        }
+    }
+    return match;
+}
+
 // define needed free energies and concentrations dependent on template en mRNA binding
 variable_definition_t def_variables_given_ij(int i,int j, double G_bb, double G_k){
     variable_definition_t variable_definition;
+    // i and j can be 1,2,3,4
+    std::vector<int> base_i = base_OH_groups(i);
+    std::vector<int> base_j = base_OH_groups(j);
+    int OH_matches = matches(base_i, base_j);
     
-    // G_bb = 0;
-    if(i ==0 && j==0){
-        variable_definition.concentration = 1;
-        variable_definition.concentration_star= 1.5;
-        variable_definition.delta_G = 5;
-        variable_definition.delta_G_bb = G_bb;
-        variable_definition.delta_G_k = G_k;
-    }
-    else if(i == 0 && j==1){
+    if(OH_matches == 3){
         variable_definition.concentration = 1;
         variable_definition.concentration_star= 1.5;
         variable_definition.delta_G = 5;
         variable_definition.delta_G_bb = G_bb;
         variable_definition.delta_G_k = 0;
     }
-    else if(i == 1 && j==0){
-        variable_definition.concentration = 1;
-        variable_definition.concentration_star= 1.5;
-        variable_definition.delta_G = 5;
-        variable_definition.delta_G_bb = G_bb;
-        variable_definition.delta_G_k = 0;
-    }
-    else {
+    
+    else{
         variable_definition.concentration = 1;
         variable_definition.concentration_star= 1.5;
         variable_definition.delta_G = 5;
@@ -161,7 +181,7 @@ std::vector<int> template_string(int string_length){
     // create a (uniformly) randomized template string 
     std::vector<int> string;
     std::default_random_engine generator;
-    std::uniform_real_distribution<double> distribution(0.0,1.0);
+    std::uniform_real_distribution<double> distribution(1.0,4.0);
     for(int j=0; j<string_length; j++){
         double random_number = distribution(generator);
         int rounded_random_number = round(random_number);
@@ -173,10 +193,16 @@ std::vector<int> template_string(int string_length){
 int error(int i, int j){
         //error vector with -5 is incorrect, 5 is correct
         int E = 0;
-        if(i==j){
-            E = -5;}
-        else{
+        if(i = 1 && j==2){
             E = 5;}
+        else if(i = 2 && j==1){
+            E = 5;}
+        else if(i = 3 && j==4){
+            E = 5;}
+        else if(i = 4 && j==3){
+            E = 5;}
+        else{
+            E = -5;}
     return E;
     }
 

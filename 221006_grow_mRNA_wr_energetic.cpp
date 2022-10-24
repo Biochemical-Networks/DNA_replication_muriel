@@ -1,3 +1,13 @@
+/* 
+06-10-22, Muriel Louman, AMOLF
+
+Grow mRNA, assumingh template string of only ones. The energetic case of Jenny's paper. 
+delta G_k = 0, delta G_TT = delta G
+
+mRNA only consisting of zeros and ones.
+*/
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container

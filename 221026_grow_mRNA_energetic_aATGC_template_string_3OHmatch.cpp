@@ -1,3 +1,13 @@
+/*
+26-10-2022, Muriel Louman, AMOLF
+
+grow mRNA from a random template string using 4 bases, aA, C, G, T. Assuming a energetic case to test if I can reproduce Jenny's
+results. Define a match as being able to bind a OH bond. delta G_k = 0 always, delta G_w = 2 and delta G_r = 2 + delta_G.
+delta G_w is when there are less than 3 matches, delta G_r is when there are 3 matches 
+
+*/
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container
@@ -298,9 +308,9 @@ int main(){
                 else{
                     // define probabilities needed for going to t1 or t2
                     double alpha_2_add_aA = a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
-                    double alpha_2_add_T = a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
-                    double alpha_2_add_G = a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
-                    double alpha_2_add_C = a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
+                    double alpha_2_add_T  = a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
+                    double alpha_2_add_G  = a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
+                    double alpha_2_add_C  = a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
                     double gamma_1 = c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g)/(a_2(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + a_2(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + c_1(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
                     
                     if(random_number1 < alpha_2_add_aA){
@@ -340,8 +350,8 @@ int main(){
                 // if in trasition state -1, adding a 1(=aA) to the mRNA string
                 if(transition_state == -1){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
-                    double beta_2_add_1 = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + b_2(k_bb));
-                    double beta_1_add_1 = b_1(k_bb, mRNA_string[i], 1, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 1, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
+                    double beta_2_add_1  = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 1, delta_g_bb, delta_g) + b_2(k_bb));
+                    double beta_1_add_1  = b_1(k_bb, mRNA_string[i], 1, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 1, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double gamma_2_add_1 = c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 1, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double prob_add_monomer_1 = (beta_2_add_1 * gamma_2_add_1)/ (1 - beta_1_add_1 *beta_2_add_1);
                     if(prob_add_monomer_1 > random_number2){
@@ -356,8 +366,8 @@ int main(){
                 // if in trasition state -2, adding a 2(=T) to the mRNA string
                 else if(transition_state == -2){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
-                    double beta_2_add_1 = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + b_2(k_bb));
-                    double beta_1_add_1 = b_1(k_bb, mRNA_string[i], 2, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 2, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
+                    double beta_2_add_1  = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 2, delta_g_bb, delta_g) + b_2(k_bb));
+                    double beta_1_add_1  = b_1(k_bb, mRNA_string[i], 2, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 2, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double gamma_2_add_1 = c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 2, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double prob_add_monomer_1 = (beta_2_add_1 * gamma_2_add_1)/ (1 - beta_1_add_1 *beta_2_add_1);
                     if(prob_add_monomer_1 > random_number2){
@@ -372,8 +382,8 @@ int main(){
                 // if in trasition state -3, adding a 3(=G) to the mRNA string
                 else if(transition_state == -3){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
-                    double beta_2_add_1 = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + b_2(k_bb));
-                    double beta_1_add_1 = b_1(k_bb, mRNA_string[i], 3, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 3, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
+                    double beta_2_add_1  = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 3, delta_g_bb, delta_g) + b_2(k_bb));
+                    double beta_1_add_1  = b_1(k_bb, mRNA_string[i], 3, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 3, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double gamma_2_add_1 = c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 3, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double prob_add_monomer_1 = (beta_2_add_1 * gamma_2_add_1)/ (1 - beta_1_add_1 *beta_2_add_1);
                     if(prob_add_monomer_1 > random_number2){
@@ -388,8 +398,8 @@ int main(){
                 // if in trasition state -4, adding a 1(=C) to the mRNA string
                 else if(transition_state == -4){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
-                    double beta_2_add_1 = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + b_2(k_bb));
-                    double beta_1_add_1 = b_1(k_bb, mRNA_string[i], 4, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 4, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
+                    double beta_2_add_1  = b_2(k_bb)/(a_1(k_on, mRNA_template[i+1], 4, delta_g_bb, delta_g) + b_2(k_bb));
+                    double beta_1_add_1  = b_1(k_bb, mRNA_string[i], 4, delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 4, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double gamma_2_add_1 = c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i], 4, delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g));
                     double prob_add_monomer_1 = (beta_2_add_1 * gamma_2_add_1)/ (1 - beta_1_add_1 *beta_2_add_1);
                     if(prob_add_monomer_1 > random_number2){
@@ -405,8 +415,8 @@ int main(){
                 // if in trasition state 2, remove a monomer or stay in s(M)
                 else if(transition_state == 2){
                     //define the probabilities for changing between states --> together the prob to add monomer 1 
-                    double beta_2_remove = b_2(k_bb)/(a_1(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g) + b_2(k_bb));
-                    double beta_1_remove = b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
+                    double beta_2_remove  = b_2(k_bb)/(a_1(k_on, mRNA_template[i], mRNA_string[i], delta_g_bb, delta_g) + b_2(k_bb));
+                    double beta_1_remove  = b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
                     double gamma_2_remove = c_2(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g)/(b_1(k_bb, mRNA_string[i-1], mRNA_string[i], delta_g_bb, delta_g) + c_2(k_on, mRNA_template[i-1], mRNA_string[i-1], delta_g_bb, delta_g));
                     double prob_stay_s_M = gamma_2_remove/ (1 - beta_1_remove *beta_2_remove);
                     if(prob_stay_s_M > random_number2){

@@ -1,3 +1,14 @@
+/*
+24-10-2022, Muriel Louman, AMOLF
+
+grow mRNA from a random template string using 4 bases, aA, C, G, T. Assuming a kinetic case to test if I can reproduce Jenny's
+results. Define a match as being able to bind 3 OH bonds. delta G_k = 0 if a match, otherwise it is a value we differ. 
+
+*/
+
+
+
+
 #include <iostream>
 #include <cmath> // math functions
 #include <vector> // vector container

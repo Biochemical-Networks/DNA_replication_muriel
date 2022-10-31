@@ -1,0 +1,51 @@
+#import needed packages
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import math
+import datetime
+import os.path
+
+def date_now(now):
+    year = '{:02d}'.format(now.year)
+    month = f'{now.month}' 
+    day = f'{now.day}' 
+    string_date = year + month + day
+    print(string_date)
+    return string_date
+
+L_delta_g_bb = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+L_delta_g_k = [0,2,4,6,8,10]
+
+date = date_now(datetime.datetime.now())
+
+
+for delta_g_k in L_delta_g_k:
+    L_epsilon = []
+    L_delta_g_bb_graph = []
+    for delta_g_bb in L_delta_g_bb:
+        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221025output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
+        if file_exists == True:
+            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221025output/%s_delta_g_bb_%s_delta_g_k_%s.csv'%(date,delta_g_bb, delta_g_k))
+            # print(data)
+            epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
+            L_epsilon.append(epsilon)
+            L_delta_g_bb_graph.append(delta_g_bb)
+            
+            # check epsilon geequilibreerd
+            # plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_bb, delta_g_k))
+            # plt.legend()
+
+    print(L_delta_g_bb_graph, L_epsilon)
+    plt.plot(L_delta_g_bb_graph, L_epsilon, label = "$\Delta G_k = %s$"%(delta_g_k))
+    plt.title("Kinetic: Effect $G_{pol}$ on error of mRNA string, with $\Delta G_{TT}$ = 0")
+    plt.xlabel("$\Delta G_{pol}$")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+plt.subplots_adjust(right=0.7)
+plt.show()
+
+
+
+
+

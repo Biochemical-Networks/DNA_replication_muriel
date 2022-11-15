@@ -151,22 +151,23 @@ def hist_counts_transitition_states(L_counts, L_count_label, L_g_bb, ratio_str):
     plt.show()
     return
 
-def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, ratio):
+def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, ratio,delta_g):
     plt.plot(length_polymer, error_prob, label = "$\Delta G_{bb}$ = %s, aA:T:G:C = %s"%(delta_g_bb, ratio))
-    plt.title("Check when error is equiliobrated as function of the length of the mRNA grown, for different $\Delta G_{bb}$ and ratios aA:T:G:C")
+    plt.title("Check when error is equilibrated as function of the length of the mRNA grown with OH strength = %s, for different $\Delta G_{bb}$ and ratios aA:T:G:C"%delta_g)
     plt.xlabel("length mRNA")
     plt.ylabel("$\epsilon$")
     plt.legend(bbox_to_anchor=(1.04, 1))
     plt.subplots_adjust(right=0.7)
     return
 
-L_delta_g_bb = [10,15,20] #[0,1,2,3,4,5,6,7,8,9,10,15,20]
-L_proportions = [[1,1,1,1], [1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]
-L_proportions_str = ['1111','1000', '0100', '0010', '0001']
-delta_g = 1
+L_delta_g_bb = [20]#[0,10,20,50,500]#[0,1,2,3,4,5,6,7,8,9,10,15,20]
+L_proportions = [[1,1,1,1]]#[[1,1,1,1], [1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]
+L_proportions_str = ['1111']#,'1000', '0100', '0010', '0001']
+delta_g = 1 #0
 
 date = date_now(datetime.datetime.now())
-date = 20221028
+# date = 20221028
+
 
 
 for i, ratio in enumerate(L_proportions):
@@ -176,28 +177,28 @@ for i, ratio in enumerate(L_proportions):
     L_bases_counts = []
     L_transition_states = []
     for delta_g_bb in L_delta_g_bb:
-        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221027output/%s_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
+        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221027output/%stest_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
         if file_exists == True:
-            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221027output/%s_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
+            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221027output/%stest_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
 
-            # average error, over last 50 bases, versus g_bb
-            epsilon = data['error probability'].iloc[-600:-1].mean(axis = 0)
-            L_epsilon.append(epsilon)
+            # # average error, over last 50 bases, versus g_bb
+            # epsilon = data['error probability'].iloc[-600:-1].mean(axis = 0)
+            # L_epsilon.append(epsilon)
 
-            #count sort of bond
-            mRNA_string = list(map(int,data['start polymer'].iloc[-1]))[400:1999]
-            template_string = list(map(int,data['template string'].iloc[-1]))[400:1999]
-            bases_count = count_sort_bonds(template_string, mRNA_string)   
-            L_bases_counts.append(bases_count)
+            # #count sort of bond
+            # mRNA_string = list(map(int,data['start polymer'].iloc[-1]))[400:1999]
+            # template_string = list(map(int,data['template string'].iloc[-1]))[400:1999]
+            # bases_count = count_sort_bonds(template_string, mRNA_string)   
+            # L_bases_counts.append(bases_count)
             # histogram_counts(bases_count, delta_g_bb, ratio_str)
 
             # check epsilon geequilibreerd
-            graph_equilibration_check(data['length polymer'], data['error probability'],delta_g_bb, ratio_str)
+            graph_equilibration_check(data['length polymer'], data['error probability'],delta_g_bb, ratio_str, delta_g)
 
 
             #count transition states it went to
-            transition_states = data['transition state'].iloc[-600:-1]
-            L_transition_states.append(transition_states)
+            # transition_states = data['transition state'].iloc[-600:-1]
+            # L_transition_states.append(transition_states)
             
             
         else:

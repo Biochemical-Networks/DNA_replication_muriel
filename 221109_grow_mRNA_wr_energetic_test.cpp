@@ -18,55 +18,6 @@ mRNA only consisting of zeros and ones.
 #include <bits/stdc++.h> //for count function
 using namespace std;
 
-// define rates
-double a_1rw_func(double k_on, double delta_g_rw, double delta_g_k){
-    return k_on * exp(-1 * delta_g_rw - delta_g_k);}
-
-double a_2rw_func(double k_on, double rw_con, double delta_g_k){
-    return k_on * rw_con * exp(-1 * delta_g_k);}
-
-double b_1_func(double k_bb, double delta_g_bb){
-    return k_bb * exp(-1 * delta_g_bb);}
-
-double b_2_func(double k_bb){
-    return k_bb;}
-
-double c_1rw_func(double k_on, double rw_con_star){
-    return k_on * rw_con_star;}
-
-double c_2rw_func(double k_on, double delta_g_rw){
-    return k_on * exp(-1* delta_g_rw);}
-
-
-
-// define probabilities between states instead of rates
-double prob_alpha_1rw(double a_1rw, double b_2){
-    // r if we add a right one (in t1), w if we are adding a wrong one (in t1)
-    return a_1rw/(a_1rw + b_2);}
-
-double prob_beta_2rw(double a_1rw, double b_2){
-    // r if we add a right one (in t1), w if we are adding a wrong one (in t1)
-    return b_2/(a_1rw + b_2);}
-
-double prob_alpha_2rw_given_sM_1_r(double a_2rw, double a_2r, double a_2w, double c_1r){
-    //given s(M-1) = r, rw beacomes: r if we are adding a right one (in t1), w if we are adding a wrong one (in t1)
-    return a_2rw/(a_2r + a_2w + c_1r);}
-
-double prob_alpha_2rw_given_sM_1_w(double a_2rw, double a_2r, double a_2w, double c_1w){
-    //given s(M-1) = w, w beacomes: r if we are adding a right one (in t1), w if we are adding a wrong one (in t1)
-    return a_2rw/(a_2r + a_2w + c_1w);}
-
-double prob_gamma_1rw(double a_2r, double a_2w, double c_1rw){
-    // rw becomes: r if we let go of a right one(in t2), w if we let go of a wrong one (in t2)
-    return c_1rw/(a_2r + a_2w + c_1rw);}
-
-double prob_beta_1rw(double b_1, double c_2rw){
-    // rw becomes: r if we let go of a right one(in t2), w if we let go of a wrong one (in t2)
-    return b_1/(c_2rw + b_1);}
-
-double prob_gamma_2rw(double b_1, double c_2rw){
-    // rw becomes: r if we let go of a right one(in t2), w if we let go of a wrong one (in t2)
-    return c_2rw/(c_2rw + b_1);}
 
 
 void print_matrix(std::vector<int> input){
@@ -143,7 +94,7 @@ std::vector<int> template_string(int string_length){
 int main(){
     // define variables
     double k_on = 1.0;
-    double k_bb = 1.0;
+    double k_bb = 1;
     double r_con = 1.0;
     double w_con = 1.0;
     double r_con_star = 1.5;
@@ -155,9 +106,10 @@ int main(){
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
-    double L_delta_g_bb[] = {20}; //we would like to have more but takes computer time
-    double L_delta_g_rw[] = {2, 4, 6, 8, 10};
-    double delta_g_w = -2;
+    double L_delta_g_bb[] = {0,1,2,3,4,5,6,7,8,9,10}; //we would like to have more but takes computer time
+    double L_delta_g_rw[] = {0,2,4,6,8,10};
+    
+    
 
     // define template string
     // std::vector<int> mRNA_template = template_string(length_mRNA);
@@ -165,36 +117,72 @@ int main(){
     //loop over different g_r = g_w and g_bb
     for (double delta_g_bb : L_delta_g_bb) {
         for (double delta_g_rw : L_delta_g_rw) {
+            
+            // // G_TT defenition
             // double delta_g_w = -1 * (delta_g_rw/2);
             // double delta_g_r = delta_g_rw/2;
+            // string model1 = "G2";
+            
+            // double x = -2;
+            // double delta_g_w = x;
+            // double delta_g_r = x + delta_g_rw;
+            // int rounded_x = round(x);
+            // string model1 = "Gx" + std::to_string(rounded_x);
 
-            double delta_g_r = delta_g_w + delta_g_rw;
-            double a_1r = a_1rw_func(k_on, delta_g_r, 0);
-            double a_1w = a_1rw_func(k_on, delta_g_w, 0);
-            double a_2r = a_2rw_func(k_on, r_con, 0);
-            double a_2w = a_2rw_func(k_on, w_con, 0);
-            double b_1 = b_1_func(k_bb, delta_g_bb);
-            double b_2 = b_2_func(k_bb);
-            double c_1r = c_1rw_func(k_on,r_con_star);
-            double c_1w = c_1rw_func(k_on,w_con_star);
-            double c_2r = c_2rw_func(k_on, delta_g_r);
-            double c_2w = c_2rw_func(k_on, delta_g_w);
+            //define rates
+            // double a_1r = k_on * exp(-1 * delta_g_r);
+            // double a_1w = k_on * exp(-1 * delta_g_w);
+            // double a_2r = k_on * r_con;
+            // double a_2w = k_on * w_con;
 
-            double alpha_1r = prob_alpha_1rw(a_1r, b_2);
-            double alpha_1w = prob_alpha_1rw(a_1w, b_2);
-            double beta_2r = prob_beta_2rw(a_1r, b_2);
-            double beta_2w = prob_beta_2rw(a_1w, b_2);
-            double gamma_1r = prob_gamma_1rw(a_2r, a_2w, c_1r);
-            double gamma_1w = prob_gamma_1rw(a_2r, a_2w, c_1w);
-            double beta_1r = prob_beta_1rw(b_1, c_2r);
-            double beta_1w = prob_beta_1rw(b_1, c_2w);
-            double gamma_2r = prob_gamma_2rw(b_1, c_2r);
-            double gamma_2w = prob_gamma_2rw(b_1, c_2w);
+            // double b_1 = k_bb * exp(-1 * delta_g_bb);
+            // double b_2 = k_bb;
+            // string model2 = "b1exp";
+
+            // // double b_1 = k_bb;
+            // // double b_2 = k_bb * exp(delta_g_bb);
+            // // string model2 = "b2exp";
+
+            // double c_1r = k_on * r_con_star; 
+            // double c_1w = k_on * w_con_star; 
+            // double c_2r = k_on * exp(-1* delta_g_r); 
+            // double c_2w = k_on * exp(-1* delta_g_w); 
+
+            double a_1r = 1;
+            double a_1w = exp(delta_g_rw);
+            double a_2r = 1;
+            double a_2w = 1;
+
+            double b_1 = exp(-1 * delta_g_bb);
+            double b_2 = 1;
+            string model1 = "b1exp";
+
+            // double b_1 = 1;
+            // double b_2 = exp(delta_g_bb);
+            // string model1 = "b2exp";
+
+            double c_1r = 1; 
+            double c_1w = exp(-1 * delta_g_rw); 
+            double c_2r = 1; 
+            double c_2w = 1; 
+            string model2 = "Jenny";
+
+            // define probabilities between states instead of rates
+            double alpha_1r = a_1r/(a_1r + b_2);   
+            double alpha_1w = a_1w/(a_1w + b_2); 
+            double beta_2r = b_2/(a_1r + b_2);
+            double beta_2w = b_2/(a_1w + b_2);
+            double gamma_1r = c_1r/(a_2r + a_2w + c_1r);
+            double gamma_1w = c_1w/(a_2r + a_2w + c_1w); 
+            double beta_1r = b_1/(c_2r + b_1);
+            double beta_1w = b_1/(c_2w + b_1);
+            double gamma_2r = c_2r/(c_2r + b_1);
+            double gamma_2w = c_2w/(c_2w + b_1);
             //NB: alpha_x2y means: given s(M-1) is x what is the prob for adding y in t1
-            double alpha_r2r = prob_alpha_2rw_given_sM_1_r(a_2r, a_2r, a_2w, c_1r);
-            double alpha_r2w = prob_alpha_2rw_given_sM_1_r(a_2w, a_2r, a_2w, c_1r);
-            double alpha_w2r = prob_alpha_2rw_given_sM_1_w(a_2r, a_2r, a_2w, c_1w);
-            double alpha_w2w = prob_alpha_2rw_given_sM_1_w(a_2w, a_2r, a_2w, c_1w);
+            double alpha_r2r = a_2r/(a_2r + a_2w + c_1r);
+            double alpha_r2w = a_2w/(a_2r + a_2w + c_1r);
+            double alpha_w2r = a_2r/(a_2r + a_2w + c_1w);   
+            double alpha_w2w = a_2w/(a_2r + a_2w + c_1w);
 
             std::vector<int> mRNA_string;
             mRNA_string.push_back(0);
@@ -242,7 +230,7 @@ int main(){
                             mRNA_string_states_length.push_back(transition_state);
                             mRNA_moves[iteration].transition_state = "t1r";
                         }
-                        else if(random_number1>=alpha_r2r && random_number1 < (alpha_r2r + alpha_r2w)){
+                        else if(random_number1 < (alpha_r2r + alpha_r2w)){
                             transition_state = -1;
                             mRNA_string_states_length.push_back(transition_state);
                             mRNA_moves[iteration].transition_state = "t1w";
@@ -260,7 +248,7 @@ int main(){
                             mRNA_string_states_length.push_back(transition_state);
                             mRNA_moves[iteration].transition_state = "t1r";
                         }
-                        else if(random_number1>=alpha_w2r && random_number1 < (alpha_w2r + alpha_w2w)){
+                        else if(random_number1 < (alpha_w2r + alpha_w2w)){
                             transition_state = -1;
                             mRNA_string_states_length.push_back(transition_state);
                             mRNA_moves[iteration].transition_state = "t1w";
@@ -330,8 +318,8 @@ int main(){
                 if(transition_state == 2){
                     // if s(M) = r
                     if(mRNA_string[i] == 0){
-                        double prob_mr_m_1r = (alpha_1r * beta_1r)/(1 - beta_1r * beta_2r);
-                        if(prob_mr_m_1r > random_number2){
+                        double prob_2mr_m_1r = (alpha_1r * beta_1r)/(1 - beta_1r * beta_2r);
+                        if(prob_2mr_m_1r > random_number2){
                             //remove s(M) = r --> go to s(M-1) = r
                             mRNA_string.pop_back();
                         }
@@ -341,8 +329,8 @@ int main(){
                     }
                     // if s(M) = w
                     if(mRNA_string[i] == 1){
-                        double prob_mw_m_1r = (alpha_1w * beta_1r)/(1 - beta_1r * beta_2w);
-                        if(prob_mw_m_1r > random_number2){
+                        double prob_2mw_m_1r = (alpha_1w * beta_1r)/(1 - beta_1r * beta_2w);
+                        if(prob_2mw_m_1r > random_number2){
                             //remove s(M) = w --> go to s(M-1) = r
                             mRNA_string.pop_back();
                         }
@@ -356,8 +344,8 @@ int main(){
                 if(transition_state == -2){
                     // if s(M) = r
                     if(mRNA_string[i] == 0){
-                        double prob_mr_m_1w = (alpha_1r * beta_1w)/(1 - beta_1w * beta_2r);
-                        if(prob_mr_m_1w > random_number2){
+                        double prob_2mr_m_1w = (alpha_1r * beta_1w)/(1 - beta_1w * beta_2r);
+                        if(prob_2mr_m_1w > random_number2){
                             //remove s(M) = r --> go to s(M-1) = w
                             mRNA_string.pop_back();
                         }
@@ -367,8 +355,8 @@ int main(){
                     }
                     // if s(M) = w
                     if(mRNA_string[i] == 1){
-                        double prob_mw_m_1w = (alpha_1w * beta_1w)/(1 - beta_1w * beta_2w);
-                        if(prob_mw_m_1w > random_number2){
+                        double prob_2mw_m_1w = (alpha_1w * beta_1w)/(1 - beta_1w * beta_2w);
+                        if(prob_2mw_m_1w > random_number2){
                             //remove s(M) = w --> go to s(M-1) = w
                             mRNA_string.pop_back();
                         }
@@ -410,10 +398,11 @@ int main(){
         //save the polymer and the path it took to get there
         int rounded_delta_g_bb = round(delta_g_bb);
         int rounded_delta_g_k = round(delta_g_rw);
+        int rounded_k_bb = round(k_bb);
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
-        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221006output/";
-        string filename_output = path + date_now + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_k_" + std::to_string(rounded_delta_g_k) + ".csv";
+        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221109output/";
+        string filename_output = path + date_now + "model" + model1 + "_" + model2 + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_k_" + std::to_string(rounded_delta_g_k) + "_k_bb_"+ std::to_string(rounded_k_bb) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
 
         }

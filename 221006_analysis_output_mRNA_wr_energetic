@@ -14,7 +14,7 @@ def date_now(now):
     print(string_date)
     return string_date
 
-L_delta_g_bb = [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+L_delta_g_bb = [0,1,2,3,4,5,6,7,8,9,10]
 L_delta_g_tt = [0,2,4,6,8,10]
 
 date = date_now(datetime.datetime.now())
@@ -32,10 +32,10 @@ for delta_g_tt in L_delta_g_tt:
             L_delta_g_bb_graph.append(delta_g_bb)
             
             # check epsilon geequilibreerd
-            # plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_bb, delta_g_k))
+            # plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_bb, delta_g_tt))
             # plt.legend()
 
-    print(L_delta_g_bb_graph, L_epsilon)
+#     print(L_delta_g_bb_graph, L_epsilon)
     plt.plot(L_delta_g_bb_graph, L_epsilon, label = "$\Delta G_{TT} = %s$"%(delta_g_tt))
     plt.title("Energetic: Effect $G_{pol}$ on error of mRNA string, with $\Delta G_k$ = 0")
     plt.xlabel("$\Delta G_{pol}$")

@@ -60,7 +60,7 @@ int matches(std::vector<int> base_i, std::vector<int> base_j){
 }
 
 int strength_of_matches(int matches){
-    return 2 * matches - 3;
+    return matches; //2 * matches - 3;
 }
 
 // define needed free energies and concentrations dependent on template en mRNA binding
@@ -235,7 +235,7 @@ int main(){
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
-    double L_delta_g_bb[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20}; //we would like to have more but takes computer time
+    double L_delta_g_bb[] = {20};//{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
     double delta_g = {1}; //strength of a OH bond/repulsion
 
     // define template string with ratios 
@@ -490,7 +490,7 @@ int main(){
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221027output/";
-        string filename_output = path + date_now + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "strength_OH_bond" + std::to_string(rounded_delta_g) + "_aATGC_ratio" +  std::to_string(rounded_ratio_aA) + std::to_string(rounded_ratio_T)+ std::to_string(rounded_ratio_G) + std::to_string(rounded_ratio_C) + ".csv";
+        string filename_output = path + date_now + "test_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "strength_OH_bond" + std::to_string(rounded_delta_g) + "_aATGC_ratio" +  std::to_string(rounded_ratio_aA) + std::to_string(rounded_ratio_T)+ std::to_string(rounded_ratio_G) + std::to_string(rounded_ratio_C) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
 
         } //end delta_g_bb loop

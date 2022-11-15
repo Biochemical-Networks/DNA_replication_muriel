@@ -78,7 +78,7 @@ variable_definition_t def_variables_given_ij(int i,int j, double G_bb, double G)
     if(OH_matches == 3){
         variable_definition.concentration = 1;
         variable_definition.concentration_star= 1.5;
-        variable_definition.delta_G = 2 + G;
+        variable_definition.delta_G = G;
         variable_definition.delta_G_bb = G_bb;
         variable_definition.delta_G_k = 0;
         }
@@ -86,12 +86,12 @@ variable_definition_t def_variables_given_ij(int i,int j, double G_bb, double G)
     else{
         variable_definition.concentration = 1;
         variable_definition.concentration_star= 1.5;
-        variable_definition.delta_G = 2;
+        variable_definition.delta_G = 0;
         variable_definition.delta_G_bb = G_bb;
         variable_definition.delta_G_k = 0;
     }
     return variable_definition;
-}
+} 
 
 // define rates
 double a_2(double k_on, int i, int j, double G_bb, double G){
@@ -223,13 +223,13 @@ int main(){
     // define variables
     double k_on = 1.0;
     double k_bb = 1.0;
-    int length_mRNA = 150;
+    int length_mRNA = 1000;
 
     // random number generator for uniform distr between 0 and 1
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
-    double L_delta_g_bb[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
+    double L_delta_g_bb[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; //we would like to have more but takes computer time
     double L_delta_g[] = {0, 2, 4, 6, 8, 10};
 
     // define template string
@@ -471,7 +471,7 @@ int main(){
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221026output/";
-        string filename_output = path + date_now + "_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_" + std::to_string(rounded_delta_g) + ".csv";
+        string filename_output = path + date_now + "test2_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "_delta_g_" + std::to_string(rounded_delta_g) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
 
         }

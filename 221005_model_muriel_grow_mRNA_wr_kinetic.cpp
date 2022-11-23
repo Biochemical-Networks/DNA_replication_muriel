@@ -5,6 +5,9 @@ Grow mRNA, assumingh template string of only ones. The kinetic case of Jenny's p
 delta G_TT = 0, delta G_k = delta G
 
 mRNA only consisting of zeros and ones.
+model muriel:
+Using a absorption matrix consisting of the probabilities to move between the absorbing states and the transition 
+states (defined by the rates). Use of a probability to move forward to t1r or t1w and backward to t2r or t2w.    
 */
 
 

@@ -1,3 +1,9 @@
+"""
+06-10-22, Muriel Louman, AMOLF
+
+analysis 221006_model_muriel_mRNA_wr_energetic
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt

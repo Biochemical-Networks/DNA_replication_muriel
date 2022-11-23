@@ -1,7 +1,7 @@
 """
-21-11-22, Muriel Louman, AMOLF
+14-11-22, Muriel Louman, AMOLF
 
-analysis 221114_grow_mRNA_wr_energetic_without_absorption_matrix
+analysis 221111_model_muriel_grow_mRNA_wr_energetic_test_rates2
 """
 
 #import needed packages
@@ -22,23 +22,23 @@ def date_now(now):
 
 L_delta_g_pol = [1,2,3,4,5,6,7,8,9,10]
 L_delta_g_tt = [2,4,6,8,10]
-L_model = ["r1", "r2", "r3"]
 
 date = date_now(datetime.datetime.now())
+L_models = ["r1","r2","r3"]
 
-for model in L_model:
+for model in L_models:
     for delta_g_tt in L_delta_g_tt:
         L_epsilon = []
         L_delta_g_bb_graph = []
-        for delta_g_pol in L_delta_g_pol:                                                          
-            file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221118output/%smodel_%sno_abs_matrix_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, delta_g_pol, delta_g_tt))
+        for delta_g_pol in L_delta_g_pol:
+            file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/%smodel_muriel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, delta_g_pol, delta_g_tt))
             if file_exists == True:
-                data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221118output/%smodel_%sno_abs_matrix_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, delta_g_pol, delta_g_tt))
+                data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/%smodel_muriel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, delta_g_pol, delta_g_tt))
                 epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
                 L_epsilon.append(epsilon)
                 L_delta_g_bb_graph.append(delta_g_pol)
                 
-                # check epsilon geequilibreerd
+                # # check epsilon geequilibreerd
                 # plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_pol, delta_g_tt))
                 # plt.legend()
             else:
@@ -46,7 +46,7 @@ for model in L_model:
 
         # print(L_delta_g_bb_graph, L_epsilon)
         plt.plot(L_delta_g_bb_graph, L_epsilon, label = "$\Delta G_{TT} = %s$"%(delta_g_tt))
-        plt.title("Energetic: model: %s, Effect $G_{pol}$ on error of mRNA string, with $\Delta G_k$ = 0"%model)
+        plt.title("Energetic: model: muriel + %s, Effect $G_{pol}$ on error of mRNA string, with $\Delta G_k$ = 0"%model)
         plt.xlabel("$\Delta G_{pol}$")
         plt.ylabel("$\epsilon$")
         plt.legend(bbox_to_anchor=(1.04, 1))

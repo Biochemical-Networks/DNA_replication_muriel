@@ -1,12 +1,18 @@
 /* 
-06-10-22, Muriel Louman, AMOLF
+21-11-22, Muriel Louman, AMOLF
 
 Grow mRNA, assumingh template string of only ones. The energetic case of Jenny's paper. 
-delta G_k = 0, delta G_TT = delta G
+delta G_k = 0, delta G_TT = delta G. Testing th effect of different rates and different definition of the absorption 
+matrix: consisting of the probabilities to move between the absorbing states and the transition 
+states (defined by the rates) or consiting of rates to move between the states.
 
 mRNA only consisting of zeros and ones.
-*/
 
+model Jenny (not what she did in paper but what other students used):
+Use psi_xy_plus or psi_xy_minus which define the rate to move forward(plus) or backward(min) between x and. using 
+the rate t1 op t2 for the first step times the absorption matrix to move from there to the next absorbing state. In this
+model you always make a move foward or backward.  
+*/
 
 #include <iostream>
 #include <cmath> // math functions

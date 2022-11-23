@@ -1,3 +1,9 @@
+"""
+30-09-22, Muriel Louman, AMOLF
+
+analysis 220915_analysis_output_mRNA_Gk0_Gtt0
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt

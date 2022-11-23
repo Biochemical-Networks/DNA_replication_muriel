@@ -1,10 +1,13 @@
 /* 
-06-10-22, Muriel Louman, AMOLF
+09-11-22, Muriel Louman, AMOLF
 
 Grow mRNA, assumingh template string of only ones. The energetic case of Jenny's paper. 
-delta G_k = 0, delta G_TT = delta G
+delta G_k = 0, delta G_TT = delta G. Testing th effect of different rates.
 
 mRNA only consisting of zeros and ones.
+model muriel:
+Using a absorption matrix consisting of the probabilities to move between the absorbing states and the transition 
+states (defined by the rates). Use of a probability to move forward to t1r or t1w and backward to t2r or t2w.   
 */
 
 

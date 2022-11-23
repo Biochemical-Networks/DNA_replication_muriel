@@ -5,6 +5,9 @@ grow mRNA from a random template string using 4 bases, aA, C, G, T. Assuming a e
 results. Define a match as being able to bind a OH bond. delta G_k = 0 always, delta G_w = 2 and delta G_r = 2 + delta_G.
 delta G_w is when there are less than 3 matches, delta G_r is when there are 3 matches 
 
+model muriel:
+Using a absorption matrix consisting of the probabilities to move between the absorbing states and the transition 
+states (defined by the rates). Use of a probability to move forward to t1r or t1w and backward to t2r or t2w.  
 */
 
 

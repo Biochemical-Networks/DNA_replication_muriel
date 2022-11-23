@@ -1,3 +1,9 @@
+"""
+09-11-22, Muriel Louman, AMOLF
+
+analysis 221109_model_muriel_grow_mRNA_wr_energetic_test_rates
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,24 +20,26 @@ def date_now(now):
     print(string_date)
     return string_date
 
-L_delta_g_pol = [10]#[1,2,3,4,5,6,7,8,9,10]
+L_delta_g_bb = [0]#,1,2,3,4,5,6,7,8,9,10]
 L_delta_g_tt = [0,2,4,6,8,10]
 
 date = date_now(datetime.datetime.now())
+model = "b2exp_Jenny"
+k_bb = 1
 
 for delta_g_tt in L_delta_g_tt:
     L_epsilon = []
     L_delta_g_bb_graph = []
-    for delta_g_pol in L_delta_g_pol:
-        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/%smodel_Jenny2_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, delta_g_pol, delta_g_tt))
+    for delta_g_bb in L_delta_g_bb:
+        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221109output/%smodel%s_delta_g_bb_%s_delta_g_k_%s_k_bb_%s.csv'%(date,model, delta_g_bb, delta_g_tt, k_bb))
         if file_exists == True:
-            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/%smodel_Jenny2_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, delta_g_pol, delta_g_tt))
+            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221109output/%smodel%s_delta_g_bb_%s_delta_g_k_%s_k_bb_%s.csv'%(date,model, delta_g_bb, delta_g_tt, k_bb))
             epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
             L_epsilon.append(epsilon)
-            L_delta_g_bb_graph.append(delta_g_pol)
+            L_delta_g_bb_graph.append(delta_g_bb)
             
             # check epsilon geequilibreerd
-            plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_pol, delta_g_tt))
+            plt.plot(data['length polymer'], data['error probability'], label = "dg_bb = %s, dg_k %s"%(delta_g_bb, delta_g_tt))
             plt.legend()
         else:
             print("file does not exist")

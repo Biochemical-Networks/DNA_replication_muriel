@@ -1,3 +1,9 @@
+"""
+19-10-22, Muriel Louman, AMOLF
+
+analysis 221007_model_muriel_grow_mRNA_wr_kinetic_template_string
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt

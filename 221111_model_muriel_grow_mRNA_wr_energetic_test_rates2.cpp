@@ -1,10 +1,14 @@
 /* 
-06-10-22, Muriel Louman, AMOLF
+11-11-22, Muriel Louman, AMOLF
 
 Grow mRNA, assumingh template string of only ones. The energetic case of Jenny's paper. 
-delta G_k = 0, delta G_TT = delta G
+delta G_k = 0, delta G_TT = delta G. Testing th effect of different rates.
 
 mRNA only consisting of zeros and ones.
+
+model muriel:
+Using a absorption matrix consisting of the probabilities to move between the absorbing states and the transition 
+states (defined by the rates). Use of a probability to move forward to t1r or t1w and backward to t2r or t2w.  
 */
 
 
@@ -79,10 +83,18 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
 
 
 int main(){
+    // define variables
+    double k_on = 1.0;
+    double k_bb = 1;
+    double r_con = 1.0;
+    double w_con = 1.0;
+    double r_con_star = 1.5;
+    double w_con_star = 1.5;
+
     //for making the error landscape defined by different delta G_tt and delta G_pol
-    double L_delta_g_tt[] = {0,2,4,6,8,10};
-    double L_delta_g_pol[] = {10};//{1,2,3,4,5,6,7,8,9,10};
-    int length_mRNA = 500;
+    double L_delta_g_tt[] = {2,4,6,8,10};
+    double L_delta_g_pol[] = {1,2,3,4,5,6,7,8,9,10};
+    int length_mRNA = 3000;
     double error_prob = 0;
     
     // random number generator for uniform distr between 0 and 1
@@ -92,16 +104,36 @@ int main(){
     for (double delta_g_pol : L_delta_g_pol){
         for (double delta_g_tt : L_delta_g_tt){
             //define rates 
-            double a_2r = 1;
-            double a_1r = exp(-delta_g_tt);
-            double a_2w = 1;
-            double a_1w = 1;
-            double b2 = 1;
-            double b1 = exp(-delta_g_pol);
-            double c_2r = 1;
-            double c_1r = exp(delta_g_tt);
-            double c_2w = 1;
-            double c_1w = 1;
+            string model_1 = "r3";
+            double delta_g_w = 2;
+            double delta_g_r = delta_g_w + delta_g_tt;
+
+            // string model_1 = "r2";
+            // double delta_g_r = delta_g_tt/2;
+            // double delta_g_w = -1 * (delta_g_tt/2);
+
+            double a_2r = k_on * r_con;
+            double a_1r = k_on * exp(-1 * delta_g_r);
+            double a_2w = k_on * w_con;
+            double a_1w = k_on * exp(-1 * delta_g_w);
+            double b2 = k_bb;
+            double b1 = k_bb * exp(-delta_g_pol);
+            double c_2r = k_on * exp(-1 * delta_g_r);
+            double c_1r = k_on * r_con_star;
+            double c_2w = k_on * exp(-delta_g_w);
+            double c_1w = k_on * w_con_star;
+            
+            // double a_2r = 1;
+            // double a_1r = 1;
+            // double a_2w = 1;
+            // double a_1w = exp(delta_g_tt);
+            // double b2 = 1;
+            // double b1 = exp(-delta_g_pol);
+            // double c_2r = 1;
+            // double c_1r = 1;
+            // double c_2w = 1;
+            // double c_1w = exp(-delta_g_tt);
+            // string model_1 = "r1";
 
             //define probabilities 
             //if s[M-1] = r
@@ -289,7 +321,7 @@ int main(){
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/";
-        string filename_output = path + date_now + "model_Jenny2_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
+        string filename_output = path + date_now + "model_muriel_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
     }} 
 }

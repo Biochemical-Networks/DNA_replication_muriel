@@ -1,3 +1,9 @@
+"""
+21-11-22, Muriel Louman, AMOLF
+
+analysis 221121_grow_mRNA_wr_energetic_Jennys_way_test_rates
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt

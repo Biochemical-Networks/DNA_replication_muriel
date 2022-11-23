@@ -1,3 +1,9 @@
+"""
+26-10-22, Muriel Louman, AMOLF
+
+analysis 221026_model_muriel_grow_mRNA_energetic_aATGC_template_string
+"""
+
 #import needed packages
 import numpy as np
 import matplotlib.pyplot as plt

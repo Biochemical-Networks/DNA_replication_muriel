@@ -28,9 +28,10 @@ string date(time_t now){
 //Create a structure variable called mRNA_move
 struct structure_mRNA_move{
     std::vector<int> polymer;
+    string transition_states;
     int length;
     double error;
-    string transition_state;
+    
     };
 
 void print_matrix(std::vector<int> input){
@@ -48,12 +49,12 @@ void print_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess){
         cout << "creates new polymer" << endl;
         print_matrix(mRNA_movess[i].polymer);
         cout << "   " << endl;
+        cout << "transition states used" << endl;
+        cout << mRNA_movess[i].transition_states << endl;
         cout << "of length" << endl;
         cout << mRNA_movess[i].length << endl;
         cout << "with error probability"  << endl;
         cout << mRNA_movess[i].error << endl;
-        cout << "moves to transition state" << endl;
-        cout << mRNA_movess[i].transition_state << endl;
         }
 }
 
@@ -61,7 +62,7 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
     ofstream fss;
     fss.open(filename.c_str());
     // write the file headers
-    fss << "polymer" << "," << "length polymer" <<"," << "error probability" << "," << "transition state used"  << std::endl;
+    fss << "polymer" << "," << "transition states used" << "," << "length polymer" <<"," << "error probability"  << std::endl;
     // loop through the array elements, which are all structures defined by structure_mRNA_move
     for(int i=0; i< mRNA_movess.size(); ++i){
         std::vector<int> input = mRNA_movess[i].polymer;
@@ -71,7 +72,16 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
         for(int j=0; j< input.size(); ++j){
             fss << input.at(j);
             }
-        fss << "," << mRNA_movess[i].length <<"," << mRNA_movess[i].error << "," << mRNA_movess[i].transition_state << std ::endl;
+
+        fss << "," << mRNA_movess[i].transition_states ;
+        // std::vector<string> input2 = mRNA_movess[i].transition_states;
+        // int m = sizeof(input2)/sizeof(input2[0]);
+ 
+        // // loop through the array elements
+        // for(int k=0; k< input2.size(); ++k){
+        //     fss << input2.at(k);
+        //     }
+        fss << "," << mRNA_movess[i].length <<"," << mRNA_movess[i].error << std ::endl;
     }
     fss.close();
 }
@@ -80,10 +90,18 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
 
 int main(){
     //for making the error landscape defined by different delta G_tt and delta G_pol
-    double L_delta_g_tt[] = {0,2,4,6,8,10};
-    double L_delta_g_pol[] = {10};//{1,2,3,4,5,6,7,8,9,10};
-    int length_mRNA = 500;
+    double L_delta_g_tt[] = {2,4,6,8,10};
+    double L_delta_g_pol[] = {1,2,3,4,5,6}; //7,8,9,10};
+    int length_mRNA = 3000;
     double error_prob = 0;
+    
+    // define variables
+    double k_on = 1.0;
+    double k_bb = 1;
+    double r_con = 1.0;
+    double w_con = 1.0;
+    double r_con_star = 1.5;
+    double w_con_star = 1.5;
     
     // random number generator for uniform distr between 0 and 1
     std::default_random_engine generator;
@@ -91,17 +109,37 @@ int main(){
     
     for (double delta_g_pol : L_delta_g_pol){
         for (double delta_g_tt : L_delta_g_tt){
-            //define rates 
+            // // define rates 
+            // string model_1 = "r3";
+            // double delta_g_w = 2;
+            // double delta_g_r = delta_g_w + delta_g_tt;
+
+            // string model_1 = "r2";
+            // double delta_g_r = delta_g_tt/2;
+            // double delta_g_w = -1 * (delta_g_tt/2);
+
+            // double a_2r = k_on * r_con;
+            // double a_1r = k_on * exp(-1 * delta_g_r);
+            // double a_2w = k_on * w_con;
+            // double a_1w = k_on * exp(-1 * delta_g_w);
+            // double b2 = k_bb;
+            // double b1 = k_bb * exp(-delta_g_pol);
+            // double c_2r = k_on * exp(-1 * delta_g_r);
+            // double c_1r = k_on * r_con_star;
+            // double c_2w = k_on * exp(-delta_g_w);
+            // double c_1w = k_on * w_con_star;
+            
             double a_2r = 1;
-            double a_1r = exp(-delta_g_tt);
+            double a_1r = 1;
             double a_2w = 1;
-            double a_1w = 1;
+            double a_1w = exp(delta_g_tt);
             double b2 = 1;
             double b1 = exp(-delta_g_pol);
             double c_2r = 1;
-            double c_1r = exp(delta_g_tt);
+            double c_1r = 1;
             double c_2w = 1;
-            double c_1w = 1;
+            double c_1w = exp(-delta_g_tt);
+            string model_1 = "r1";
 
             //define probabilities 
             //if s[M-1] = r
@@ -131,7 +169,8 @@ int main(){
             int transition_state = 0;
             std::vector<structure_mRNA_move> mRNA_moves;
             int iteration = 0;
-            string transition_state_string = "t";
+            string transition_state_string;
+            int adding_monomer = 0;
 
             while (mRNA_string.size()<length_mRNA){
                 int M = mRNA_string.size() -1;
@@ -143,12 +182,14 @@ int main(){
                     if (random_number1 < 0.5){
                         //go to t_1r
                         transition_state = 1;
-                        transition_state_string = "t1r";
+                        transition_state_string = "t1r ";
+                        adding_monomer = 0;
                     }
                     else{
                         //go to t_1w
                         transition_state = -1;
-                        transition_state_string = "t1w";
+                        transition_state_string = "t1w ";
+                        adding_monomer = 1;
                     }
                 }
                 else{
@@ -157,15 +198,19 @@ int main(){
                     if (mRNA_string[M-1] ==0){
                         if (random_number2 < alpha_r2r){
                             transition_state = 1;
-                            transition_state_string = "t1r";
+                            transition_state_string = "t1r ";
+                            adding_monomer = 0;
                         }
                         else if (random_number2 < (alpha_r2r + alpha_r2w)){
                             transition_state = -1;
-                            transition_state_string = "t1w";
+                            transition_state_string = "t1w ";
+                            adding_monomer = 1;
                         }
                         else{
                             transition_state = 2;
-                            transition_state_string = "t2r";
+                            transition_state_string = "t2r ";
+                            adding_monomer = mRNA_string[M];
+                            mRNA_string.pop_back();
                         }   
                     }
                     // if s[M-1] = w
@@ -173,91 +218,125 @@ int main(){
                     if (mRNA_string[M-1] ==1){
                         if (random_number7 < alpha_w2r){
                             transition_state = 1;
-                            transition_state_string = "t1r";
+                            transition_state_string = "t1r ";
+                            adding_monomer = 0;
                         }
                         else if (random_number7 < (alpha_w2r + alpha_w2w)){
                             transition_state = -1;
-                            transition_state_string = "t1w";
+                            transition_state_string = "t1w ";
+                            adding_monomer = 1;
                         }
                         else{
                             transition_state = -2;
-                            transition_state_string = "t2w";
+                            transition_state_string = "t2w ";
+                            adding_monomer = mRNA_string[M];
+                            mRNA_string.pop_back();
                         }   
                     }
                 }
 
+                // you have to define M again since you could have popped back when you went to transition state 2
+                M = mRNA_string.size() -1;
 
-
-                // define from the transition state we are in, which monomer is added, not added or removed.
-                // if in trabnsition state t1r
-                if (transition_state == 1){
-                    double random_number3 = distribution(generator);
-                    if (random_number3 < beta_2r){
-                        transition_state = 2;
-                    }
-                    else{
-                        // else go back to s[M]
-                        transition_state = 0
-                    }
-                    
-                }
-
-                // if in transition state 1tw
-                else if (transition_state == -1){
-                    double random_number4 = distribution(generator);
-                    if(random_number4 < beta_2w){
-                        transition_state = -2
-                    }
-                    else{
-                        // else go back to s[M]
-                        transition_state = 0
-                    }
-                }
-
-                //if in transition state 2tr
-                else if (transition_state == 2){
-                    double random_number5 = distribution(generator);
-                    
-                    if (mRNA_string[M] == 0){
-                        double prob_r_2tr = (alpha_1r * beta_1r)/(1 - beta_1r * beta_2r);
-                        if (random_number5 < prob_r_2tr){
-                            mRNA_string.pop_back();
+                // define from the transition state we are in, which monomer is added or removed.
+                while (transition_state != 0){
+                    // if in trabnsition state t1r
+                    if (transition_state == 1){
+                        double random_number3 = distribution(generator);
+                        if (random_number3 < beta_2r){
+                            if(mRNA_string[M] == 0){
+                                transition_state = 2;
+                                transition_state_string = transition_state_string + "t2r ";
+                            }
+                            else{ //s[M] = 1
+                                transition_state = -2;
+                                transition_state_string = transition_state_string + "t2w ";
+                            }
                         }
-                        //else nothing happens
+                        else{
+                            // else go back to s[M]
+                            transition_state = 0;
+                        }    
                     }
-                    else if (mRNA_string[M] == 1){
-                        double prob_w_2tr = (alpha_1w * beta_1r)/(1 - beta_1r * beta_2w);
-                        if (random_number5 < prob_w_2tr){
-                            mRNA_string.pop_back();
+
+                    // if in transition state 1tw
+                    else if (transition_state == -1){
+                        double random_number4 = distribution(generator);
+                        if(random_number4 < beta_2w){
+                            if(mRNA_string[M] == 0){
+                                transition_state = 2;
+                                transition_state_string = transition_state_string + "t2r ";
+                            }
+                            else{ //s[M] = 1
+                                transition_state = -2;
+                                transition_state_string = transition_state_string + "t2w ";
+                            }
                         }
-                        //else nothing happens
-                    }
-                }
-                // if in transition state 2tw
-                else if (transition_state == -2){
-                    double random_number6 = distribution(generator);
-                    if (mRNA_string[M] == 0){
-                        double prob_r_2tw = (alpha_1r * beta_1w) / (1 - beta_1w * beta_2r);
-                        if (random_number6 < prob_r_2tw){
-                            mRNA_string.pop_back();
-                        } 
-                        // else nothing happens
-                    }
-                    else if (mRNA_string[M] == 1){
-                        double prob_w_2tw = (alpha_1w * beta_1w)/(1 - beta_1w * beta_2w);
-                        if (random_number6 < prob_w_2tw){
-                            mRNA_string.pop_back();
+                        else{
+                            // else go back to s[M]
+                            transition_state = 0;
                         }
-                        //else nothing happens
                     }
-                }
+
+                    //if in transition state 2tr
+                    else if (transition_state == 2){
+                        double random_number5 = distribution(generator);
+                        if (random_number5 < gamma_2r){
+                            if(adding_monomer == 0){
+                                mRNA_string.push_back(0);
+                                transition_state = 0;
+                            }
+                            else{
+                                mRNA_string.push_back(1);
+                                transition_state = 0;
+                            }
+                        }
+                        else{
+                            if(adding_monomer == 0){
+                                transition_state = 1;
+                                transition_state_string = transition_state_string + "t1r ";
+                            }
+                            else{
+                                transition_state = -1;
+                                transition_state_string = transition_state_string + "t1w ";
+                            }   
+                        }
+                    }
+
+
+                    //if in transition state 2tw
+                    else if (transition_state == -2){
+                        double random_number5 = distribution(generator);
+                        if (random_number5 < gamma_2w){
+                            if(adding_monomer == 0){
+                                mRNA_string.push_back(0);
+                                transition_state = 0;
+                            }
+                            else{
+                                mRNA_string.push_back(1);
+                                transition_state = 0;
+                            }
+                        }
+                        else{
+                            if(adding_monomer == 0){
+                                transition_state = 1;
+                                transition_state_string = transition_state_string + "t1r ";
+                            }
+                            else{
+                                transition_state = -1;
+                                transition_state_string = transition_state_string + "t1w ";
+                            }   
+                        }
+                    }
+            }
             mRNA_moves.push_back(structure_mRNA_move());
             error_prob = count(mRNA_string.begin(), mRNA_string.end(), 1)/(double)mRNA_string.size();
             mRNA_moves[iteration].polymer = mRNA_string;
             mRNA_moves[iteration].length= mRNA_string.size();
             mRNA_moves[iteration].error = error_prob;
-            mRNA_moves[iteration].transition_state = transition_state_string;
+            mRNA_moves[iteration].transition_states = transition_state_string;
             iteration += 1;
+            
             }
 
         //print polymer growth, which moves where taken
@@ -275,8 +354,8 @@ int main(){
         int rounded_delta_g_tt = round(delta_g_tt);
         std:cout << " done" << std::endl;
         string date_now = date(time(0));
-        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/";
-        string filename_output = path + date_now + "model_Jenny2_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
+        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221118output/";
+        string filename_output = path + date_now + "model_" + model_1 + "no_abs_matrix_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
         save_matrix_of_structures(mRNA_moves, filename_output);
     }} 
 }

@@ -77,15 +77,7 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
         for(int j=0; j< input.size(); ++j){
             fss << input.at(j);
             }
-
         fss << "," << mRNA_movess[i].transition_states ;
-        // std::vector<string> input2 = mRNA_movess[i].transition_states;
-        // int m = sizeof(input2)/sizeof(input2[0]);
- 
-        // // loop through the array elements
-        // for(int k=0; k< input2.size(); ++k){
-        //     fss << input2.at(k);
-        //     }
         fss << "," << mRNA_movess[i].length <<"," << mRNA_movess[i].error << std ::endl;
     }
     fss.close();
@@ -96,7 +88,7 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
 int main(){
     //for making the error landscape defined by different delta G_tt and delta G_pol
     double L_delta_g_tt[] = {2,4,6,8,10};
-    double L_delta_g_pol[] = {1,2,3,4,5,6}; //7,8,9,10};
+    double L_delta_g_pol[] = {1,2,3,4,5,6,7,8,9,10};
     int length_mRNA = 3000;
     double error_prob = 0;
     
@@ -134,17 +126,29 @@ int main(){
             // double c_2w = k_on * exp(-delta_g_w);
             // double c_1w = k_on * w_con_star;
             
+            // double a_2r = 1;
+            // double a_1r = 1;
+            // double a_2w = 1;
+            // double a_1w = exp(delta_g_tt);
+            // double b2 = 1;
+            // double b1 = exp(-delta_g_pol);
+            // double c_2r = 1;
+            // double c_1r = 1;
+            // double c_2w = 1;
+            // double c_1w = exp(-delta_g_tt);
+            // string model_1 = "r1";
+
             double a_2r = 1;
             double a_1r = 1;
             double a_2w = 1;
             double a_1w = exp(delta_g_tt);
-            double b2 = 1;
-            double b1 = exp(-delta_g_pol);
+            double b2 = exp(delta_g_pol);
+            double b1 = 1;
             double c_2r = 1;
             double c_1r = 1;
             double c_2w = 1;
             double c_1w = exp(-delta_g_tt);
-            string model_1 = "r1";
+            string model_1 = "r4";
 
             //define probabilities 
             //if s[M-1] = r

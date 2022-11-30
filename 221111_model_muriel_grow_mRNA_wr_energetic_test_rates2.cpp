@@ -104,24 +104,24 @@ int main(){
     for (double delta_g_pol : L_delta_g_pol){
         for (double delta_g_tt : L_delta_g_tt){
             //define rates 
-            string model_1 = "r3";
-            double delta_g_w = 2;
-            double delta_g_r = delta_g_w + delta_g_tt;
+            // string model_1 = "r3";
+            // double delta_g_w = 2;
+            // double delta_g_r = delta_g_w + delta_g_tt;
 
             // string model_1 = "r2";
             // double delta_g_r = delta_g_tt/2;
             // double delta_g_w = -1 * (delta_g_tt/2);
 
-            double a_2r = k_on * r_con;
-            double a_1r = k_on * exp(-1 * delta_g_r);
-            double a_2w = k_on * w_con;
-            double a_1w = k_on * exp(-1 * delta_g_w);
-            double b2 = k_bb;
-            double b1 = k_bb * exp(-delta_g_pol);
-            double c_2r = k_on * exp(-1 * delta_g_r);
-            double c_1r = k_on * r_con_star;
-            double c_2w = k_on * exp(-delta_g_w);
-            double c_1w = k_on * w_con_star;
+            // double a_2r = k_on * r_con;
+            // double a_1r = k_on * exp(-1 * delta_g_r);
+            // double a_2w = k_on * w_con;
+            // double a_1w = k_on * exp(-1 * delta_g_w);
+            // double b2 = k_bb;
+            // double b1 = k_bb * exp(-delta_g_pol);
+            // double c_2r = k_on * exp(-1 * delta_g_r);
+            // double c_1r = k_on * r_con_star;
+            // double c_2w = k_on * exp(-delta_g_w);
+            // double c_1w = k_on * w_con_star;
             
             // double a_2r = 1;
             // double a_1r = 1;
@@ -134,6 +134,18 @@ int main(){
             // double c_2w = 1;
             // double c_1w = exp(-delta_g_tt);
             // string model_1 = "r1";
+
+            double a_2r = 1;
+            double a_1r = 1;
+            double a_2w = 1;
+            double a_1w = exp(delta_g_tt);
+            double b2 = exp(delta_g_pol);
+            double b1 = 1;
+            double c_2r = 1;
+            double c_1r = 1;
+            double c_2w = 1;
+            double c_1w = exp(-delta_g_tt);
+            string model_1 = "r4";
 
             //define probabilities 
             //if s[M-1] = r

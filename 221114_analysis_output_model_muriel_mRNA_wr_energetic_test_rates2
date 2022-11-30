@@ -24,7 +24,7 @@ L_delta_g_pol = [1,2,3,4,5,6,7,8,9,10]
 L_delta_g_tt = [2,4,6,8,10]
 
 date = date_now(datetime.datetime.now())
-L_models = ["r1","r2","r3"]
+L_models = ["r1","r2","r3", "r4"]
 
 for model in L_models:
     for delta_g_tt in L_delta_g_tt:

@@ -1,0 +1,230 @@
+"""
+24-11-22, Muriel Louman, AMOLF
+
+analysis 221027_model_muriel_grow_mRNA_aATGC_template_string_OHrep_attr_strong_b2
+"""
+
+
+#import needed packages
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import math
+import datetime
+import os.path
+import operator
+from matplotlib.pyplot import cm
+
+def date_now(now):
+    year = '{:02d}'.format(now.year)
+    month = f'{now.month}' 
+    day = f'{now.day}' 
+    string_date = year + month + day
+    print(string_date)
+    return string_date
+
+
+def graph_error_g_bb(L_delta_g_bb, L_epsilon, delta_g, ratio_str):
+    plt.plot(L_delta_g_bb, L_epsilon, label = "ratio aA:T:G:C = %s" %ratio_str)
+    plt.title("Effect $G_{pol}$ in error of mRNA string, with $\Delta G_k$ = 0 and OH bond = $\Delta G$ = %s, and template string with different ratios bases"%delta_g)
+    plt.xlabel("$\Delta G_{pol}$")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+def count_sort_bonds(template_string, mRNA_string):
+    base_11, base_12, base_13, base_14, base_22, base_23, base_24, base_33, base_34, base_44 = 0,0,0,0,0,0,0,0,0,0
+    L_pairs = []
+    for i in range(0,len(mRNA_string)):
+        base_i = template_string[i]
+        base_j = mRNA_string[i]
+        pair = [base_i, base_j]
+        L_pairs.append(pair)
+        if 1 in pair:
+            if 2 in pair:
+                base_12 += 1
+            elif 3 in pair: 
+                base_13 += 1
+            elif 4 in pair:
+                base_14 += 1
+            else: 
+                base_11 += 1
+        elif 2 in pair:
+            if 3 in pair:
+                base_23 += 1
+            elif 4 in pair:
+                base_24 += 1
+            else:
+                base_22 +=1
+        elif 3 in pair:
+            if 4 in pair:
+                base_34 += 1
+            else: 
+                base_33 += 1
+        else: 
+            base_44 += 1
+        
+    bases = ['aA-aA', 'aA-U', 'aA-G', 'aA-C', 'U-U', 'U-G', 'U-C', 'G-G', 'G-C', 'C-C']
+    bases_counts = [base_11, base_12, base_13, base_14, base_22, base_23, base_24, base_33, base_34, base_44]
+    return bases_counts
+
+def histogram_counts(bases_counts, delta_g_bb, ratio):
+    bases = ['aA-aA', 'aA-U', 'aA-G', 'aA-C', 'U-U', 'U-G', 'U-C', 'G-G', 'G-C', 'C-C']
+    plt.figure()
+    plt.bar(bases, bases_counts , color ='maroon', width = 0.4)
+    plt.xlabel('base-base between DNA and mRNA', fontweight ='bold', fontsize = 15)
+    plt.ylabel('Count', fontweight ='bold', fontsize = 15)
+    plt.title("Counts of base-base between DNA and mRNA for $\Delta G_{bb}$ = %s, ratio bases template string: aA:T:C:G = %s"%(delta_g_bb, ratio_str))
+    return
+
+def hist_counts_multiple_bars(L_counts, L_count_label, L_g_bb, ratio_str):
+    colors = cm.rainbow(np.linspace(0, 1, len(L_counts)))
+
+    # set width of bar
+    barWidth = 1/(len(L_counts)+1)
+    fig = plt.subplots(figsize =(12, 8))
+    
+    # Set position of bar on X axis
+    L_bar_position = []
+    for b_bar in range(0,len(L_counts)):
+        bar = np.arange(len(L_counts[0])) + b_bar *barWidth
+        L_bar_position.append(bar)
+
+    # Make the plot
+    for n_bar in range(0,len(L_counts)):
+        plt.bar(L_bar_position[n_bar], L_counts[n_bar], color =colors[n_bar], width = barWidth,
+            edgecolor ='grey', label ="$\Delta G_{bb}$ = %s "%L_g_bb[n_bar])
+    
+    
+    # Adding Xticks
+    plt.xlabel('base-base between DNA and mRNA', fontweight ='bold', fontsize = 15)
+    plt.ylabel('Count', fontweight ='bold', fontsize = 15)
+    plt.xticks([r + barWidth for r in range(len(L_counts[0]))],
+            L_count_label)
+    plt.title("%s"%ratio_str)
+    
+    plt.legend()
+    plt.show()
+    return
+
+def hist_counts_transitition_states(L_counts, L_count_label, L_g_bb, ratio_str):
+    #nog niet af!!!!
+    colors = cm.rainbow(np.linspace(0, 1, len(L_counts)))
+    N = 3
+    ind = np.arange(N) 
+    width = 0.25
+    
+    xvals = [8, 9, 2]
+    bar1 = plt.bar(ind, xvals, width, color = 'r')
+    
+    yvals = [10, 20, 30]
+    bar2 = plt.bar(ind+width, yvals, width, color='g')
+    
+    zvals = [11, 12, 13]
+    bar3 = plt.bar(ind+width*2, zvals, width, color = 'b')
+    
+    plt.xlabel("Dates")
+    plt.ylabel('Scores')
+    plt.title("Players Score")
+    
+    plt.xticks(ind+width,['2021Feb01', '2021Feb02', '2021Feb03'])
+    plt.legend( (bar1, bar2, bar3), ('Player1', 'Player2', 'Player3') )
+    plt.show()    
+    # set width of bar
+    barWidth = 1/(len(L_counts)+1)
+    fig = plt.subplots(figsize =(12, 8))
+    
+    # Set position of bar on X axis
+    L_bar_position = []
+    for b_bar in range(0,len(L_counts)):
+        bar = np.arange(len(L_counts[0])) + b_bar *barWidth
+        L_bar_position.append(bar)
+
+    # Make the plot
+    for n_bar in range(0,len(L_counts)):
+        plt.bar(L_bar_position[n_bar], L_counts[n_bar], color =colors[n_bar], width = barWidth,
+            edgecolor ='grey', label ="$\Delta G_{bb}$ = %s "%L_g_bb[n_bar])
+    
+    
+    # Adding Xticks
+    plt.xlabel('base-base between DNA and mRNA', fontweight ='bold', fontsize = 15)
+    plt.ylabel('Count', fontweight ='bold', fontsize = 15)
+    plt.xticks([r + barWidth for r in range(len(L_counts[0]))],
+            L_count_label)
+    plt.title("%s"%ratio_str)
+    
+    plt.legend()
+    plt.show()
+    return
+
+def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, ratio,delta_g):
+    plt.plot(length_polymer, error_prob, label = "$\Delta G_{bb}$ = %s, aA:T:G:C = %s"%(delta_g_bb, ratio))
+    plt.title("Check when error is equilibrated as function of the length of the mRNA grown with OH strength = %s, for different $\Delta G_{bb}$ and ratios aA:T:G:C"%delta_g)
+    plt.xlabel("length mRNA")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+L_delta_g_bb = [0,1,2,3,4,5,6,7,8,9,10] #[-1,-0.7,-0.6,-0.5,-0.4, -0.3, -0.2,-0.1]
+L_proportions = [[1,1,1,1],[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]
+L_proportions_str = ['1111','1000', '0100', '0010', '0001']
+delta_g = 1 #0
+
+date = date_now(datetime.datetime.now())
+
+
+
+for i, ratio in enumerate(L_proportions):
+    ratio_str = L_proportions_str[i]
+
+    L_epsilon = []
+    L_bases_counts = []
+    L_transition_states = []
+    for delta_g_bb in L_delta_g_bb:
+        # delta_g_bb_string = -1*delta_g_bb
+        file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221124output/%smodel_muriel_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
+        if file_exists == True:
+            data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221124output/%smodel_muriel_delta_g_bb_%sstrength_OH_bond%s_aATGC_ratio%s.csv'%(date,delta_g_bb, delta_g, ratio_str))
+
+            # # average error, over last 50 bases, versus g_bb
+            epsilon = data['error probability'].iloc[-600:-2].mean(axis = 0)
+            L_epsilon.append(epsilon)
+
+            # #count sort of bond
+            mRNA_string = list(map(int,data['start polymer'].iloc[-2]))[400:1998]
+            template_string = list(map(int,data['length polymer'].iloc[-1]))[400:1998]
+            bases_count = count_sort_bonds(template_string, mRNA_string)   
+            L_bases_counts.append(bases_count)
+            # histogram_counts(bases_count, delta_g_bb, ratio_str)
+
+            # check epsilon geequilibreerd
+            # graph_equilibration_check(data['length polymer'], data['error probability'],delta_g_bb, ratio_str, delta_g)
+
+
+            #count transition states it went to
+            # transition_states = data['transition state used'].iloc[-600:-2]
+            # L_transition_states.append(transition_states)
+            
+            
+        else:
+            print("file does not exist")
+
+    # print(L_delta_g_bb_graph, L_epsilon)
+
+    #define error as all mismatches and plot the error as function of delta G_bb
+    graph_error_g_bb(L_delta_g_bb, L_epsilon, delta_g, ratio_str)
+
+    #count base-base between DNA and mRNA to see what kind of matches are made and plot as function of delta G_bb
+    # labels_hist_matches = ['aA-aA', 'aA-U', 'aA-G', 'aA-C', 'U-U', 'U-G', 'U-C', 'G-G', 'G-C', 'C-C']
+    # hist_counts_multiple_bars(L_bases_counts, labels_hist_matches, L_delta_g_bb, ratio_str)
+
+    # histogram_transition_states(L_transition_states, L_delta_g_bb, ratio_str)
+
+plt.show()
+
+
+
+
+

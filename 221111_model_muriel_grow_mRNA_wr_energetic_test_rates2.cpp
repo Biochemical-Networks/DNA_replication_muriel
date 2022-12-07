@@ -61,24 +61,24 @@ void print_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess){
         }
 }
 
-void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std::string filename){
-    ofstream fss;
-    fss.open(filename.c_str());
-    // write the file headers
-    fss << "polymer" << "," << "length polymer" <<"," << "error probability" << "," << "transition state used"  << std::endl;
-    // loop through the array elements, which are all structures defined by structure_mRNA_move
-    for(int i=0; i< mRNA_movess.size(); ++i){
-        std::vector<int> input = mRNA_movess[i].polymer;
-        int n = sizeof(input)/sizeof(input[0]);
+// void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std::string filename){
+//     ofstream fss;
+//     fss.open(filename.c_str());
+//     // write the file headers
+//     fss << "polymer" << "," << "length polymer" <<"," << "error probability" << "," << "transition state used"  << std::endl;
+//     // loop through the array elements, which are all structures defined by structure_mRNA_move
+//     for(int i=0; i< mRNA_movess.size(); ++i){
+//         std::vector<int> input = mRNA_movess[i].polymer;
+//         int n = sizeof(input)/sizeof(input[0]);
  
-        // loop through the array elements
-        for(int j=0; j< input.size(); ++j){
-            fss << input.at(j);
-            }
-        fss << "," << mRNA_movess[i].length <<"," << mRNA_movess[i].error << "," << mRNA_movess[i].transition_state << std ::endl;
-    }
-    fss.close();
-}
+//         // loop through the array elements
+//         for(int j=0; j< input.size(); ++j){
+//             fss << input.at(j);
+//             }
+//         fss << "," << mRNA_movess[i].length <<"," << mRNA_movess[i].error << "," << mRNA_movess[i].transition_state << std ::endl;
+//     }
+//     fss.close();
+// }
 
 
 
@@ -92,8 +92,8 @@ int main(){
     double w_con_star = 1.5;
 
     //for making the error landscape defined by different delta G_tt and delta G_pol
-    double L_delta_g_tt[] = {2,4,6,8,10};
-    double L_delta_g_pol[] = {1,2,3,4,5,6,7,8,9,10};
+    double L_delta_g_tt[] = {0,2,4,6,8,10,12,14};//{0,2,4,6,8,10}; //{2,4,6,8,10};
+    double L_delta_g_pol[] = {1,2,3,4,5,6,7,8,9,10,11};
     int length_mRNA = 3000;
     double error_prob = 0;
     
@@ -103,7 +103,7 @@ int main(){
     
     for (double delta_g_pol : L_delta_g_pol){
         for (double delta_g_tt : L_delta_g_tt){
-            //define rates 
+            // define rates 
             // string model_1 = "r3";
             // double delta_g_w = 2;
             // double delta_g_r = delta_g_w + delta_g_tt;
@@ -146,6 +146,30 @@ int main(){
             double c_2w = 1;
             double c_1w = exp(-delta_g_tt);
             string model_1 = "r4";
+            
+            
+            // int x = 0;
+            // if(delta_g_tt >= delta_g_pol){
+            //     x = exp(delta_g_tt); 
+            // }
+            // else{
+            //     x = exp(delta_g_pol); 
+            // }
+            // int x = exp(delta_g_pol);
+            // int y = 1;//=x;
+            // double a_2r = 1;
+            // double a_1r = 1;
+            // double a_2w = 1;
+            // double a_1w = exp(delta_g_tt);
+            // double b2 = x;
+            // double b1 = x * exp(-delta_g_pol);
+            // double c_2r = y;
+            // double c_1r = y;
+            // double c_2w = y;
+            // double c_1w = y * exp(-delta_g_tt);
+            // int rounded_x = round(x);
+            // int rounded_y = round(y);
+            // string model_1 = "r1_x_delta_g_tt_or_delta_g_pol_y" + std::to_string(rounded_y);
 
             //define probabilities 
             //if s[M-1] = r
@@ -170,12 +194,28 @@ int main(){
             double gamma_2w = c_2w/(c_2w + b1);
 
 
+
+            //for saving to CSV file 
+            string date_now = date(time(0));
+            int rounded_delta_g_pol = round(delta_g_pol);
+            int rounded_delta_g_tt = round(delta_g_tt);
+            string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/";
+            string filename_output = path + date_now + "model_muriel_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
+            fstream fss;
+            fss.open(filename_output.c_str(), ios::out | ios::app);
+            // write the file headers
+            fss << "start polymer" << "," << "length polymer" << "," << "transition state used" <<"," << "error probability"  << "\n";
+   
             std::vector<int> mRNA_string;
             mRNA_string.push_back(0); //we begin with a right monomer
             int transition_state = 0;
-            std::vector<structure_mRNA_move> mRNA_moves;
+            structure_mRNA_move mRNA_moves;
             int iteration = 0;
             string transition_state_string = "t";
+       
+
+           
+
 
             while (mRNA_string.size()<length_mRNA){
                 int M = mRNA_string.size() -1;
@@ -308,14 +348,25 @@ int main(){
                         //else nothing happens
                     }
                 }
-            mRNA_moves.push_back(structure_mRNA_move());
+            
             error_prob = count(mRNA_string.begin(), mRNA_string.end(), 1)/(double)mRNA_string.size();
-            mRNA_moves[iteration].polymer = mRNA_string;
-            mRNA_moves[iteration].length= mRNA_string.size();
-            mRNA_moves[iteration].error = error_prob;
-            mRNA_moves[iteration].transition_state = transition_state_string;
+            mRNA_moves.polymer = mRNA_string;
+            mRNA_moves.length= mRNA_string.size();
+            mRNA_moves.error = error_prob;
+            mRNA_moves.transition_state = transition_state_string;
+
+            //save information to CSV file 
+            std::vector<int> input = mRNA_moves.polymer;
+            // loop through the array elements
+            for(int j=0; j< input.size(); ++j){
+                fss << input.at(j);
+                }
+            fss << "," << mRNA_moves.length <<"," << mRNA_moves.transition_state << ","  << mRNA_moves.error;
+            fss << "\n";
             iteration += 1;
             }
+        fss << std ::endl;
+        fss.close();
 
         //print polymer growth, which moves where taken
         // print_matrix_of_structures(mRNA_moves);
@@ -328,12 +379,8 @@ int main(){
 
 
         // //save the polymer and the path it took to get there
-        int rounded_delta_g_pol = round(delta_g_pol);
-        int rounded_delta_g_tt = round(delta_g_tt);
-        std:cout << " done" << std::endl;
-        string date_now = date(time(0));
-        string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221114output/";
-        string filename_output = path + date_now + "model_muriel_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
-        save_matrix_of_structures(mRNA_moves, filename_output);
+        
+
+
     }} 
 }

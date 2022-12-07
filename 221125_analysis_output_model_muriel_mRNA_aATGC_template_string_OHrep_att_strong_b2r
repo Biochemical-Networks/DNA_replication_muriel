@@ -214,11 +214,11 @@ for i, ratio in enumerate(L_proportions):
     # print(L_delta_g_bb_graph, L_epsilon)
 
     #define error as all mismatches and plot the error as function of delta G_bb
-    graph_error_g_bb(L_delta_g_bb, L_epsilon, delta_g, ratio_str)
+    # graph_error_g_bb(L_delta_g_bb, L_epsilon, delta_g, ratio_str)
 
     #count base-base between DNA and mRNA to see what kind of matches are made and plot as function of delta G_bb
-    # labels_hist_matches = ['aA-aA', 'aA-U', 'aA-G', 'aA-C', 'U-U', 'U-G', 'U-C', 'G-G', 'G-C', 'C-C']
-    # hist_counts_multiple_bars(L_bases_counts, labels_hist_matches, L_delta_g_bb, ratio_str)
+    labels_hist_matches = ['aA-aA', 'aA-U', 'aA-G', 'aA-C', 'U-U', 'U-G', 'U-C', 'G-G', 'G-C', 'C-C']
+    hist_counts_multiple_bars(L_bases_counts, labels_hist_matches, L_delta_g_bb, ratio_str)
 
     # histogram_transition_states(L_transition_states, L_delta_g_bb, ratio_str)
 

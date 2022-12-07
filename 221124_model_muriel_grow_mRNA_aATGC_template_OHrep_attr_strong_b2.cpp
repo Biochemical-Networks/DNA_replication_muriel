@@ -288,6 +288,7 @@ int main(){
             int rounded_ratio_T = round(L_proportions_template[k][1]);
             int rounded_ratio_G = round(L_proportions_template[k][2]);
             int rounded_ratio_C = round(L_proportions_template[k][3]);
+            
             string date_now = date(time(0));
             string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221124output/";
             string filename_output = path + date_now + "model_muriel_delta_g_bb_" + std::to_string(rounded_delta_g_bb) + "strength_OH_bond" + std::to_string(rounded_delta_g) + "_aATGC_ratio" +  std::to_string(rounded_ratio_aA) + std::to_string(rounded_ratio_T)+ std::to_string(rounded_ratio_G) + std::to_string(rounded_ratio_C) + ".csv";
@@ -471,12 +472,14 @@ int main(){
                 fss << "\n";
                 iteration += 1;
             } // end while loop --> make mRNa
+
         fss << "template string" << ",";
         std::vector<int> in = mRNA_moves.template_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
                     fss << in.at(j) ;
                     }
+        fss << std ::endl;
         fss.close();
 
         // print the polymer computed

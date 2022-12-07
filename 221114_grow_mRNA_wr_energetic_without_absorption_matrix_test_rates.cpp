@@ -126,31 +126,31 @@ int main(){
             // double c_2w = k_on * exp(-delta_g_w);
             // double c_1w = k_on * w_con_star;
             
-            // double a_2r = 1;
-            // double a_1r = 1;
-            // double a_2w = 1;
-            // double a_1w = exp(delta_g_tt);
-            // double b2 = 1;
-            // double b1 = exp(-delta_g_pol);
-            // double c_2r = 1;
-            // double c_1r = 1;
-            // double c_2w = 1;
-            // double c_1w = exp(-delta_g_tt);
-            // string model_1 = "r1";
-
             double a_2r = 1;
             double a_1r = 1;
             double a_2w = 1;
             double a_1w = exp(delta_g_tt);
-            double b2 = exp(delta_g_pol);
-            double b1 = 1;
+            double b2 = 1;
+            double b1 = exp(-delta_g_pol);
             double c_2r = 1;
             double c_1r = 1;
             double c_2w = 1;
             double c_1w = exp(-delta_g_tt);
-            string model_1 = "r4";
+            string model_1 = "r1";
 
-            //define probabilities 
+            // double a_2r = 1;
+            // double a_1r = 1;
+            // double a_2w = 1;
+            // double a_1w = exp(delta_g_tt);
+            // double b2 = exp(delta_g_pol);
+            // double b1 = 1;
+            // double c_2r = 1;
+            // double c_1r = 1;
+            // double c_2w = 1;
+            // double c_1w = exp(-delta_g_tt);
+            // string model_1 = "r4";
+
+            // define probabilities 
             //if s[M-1] = r
             double alpha_r2r = a_2r/(a_2w + a_2r + c_1r);
             double alpha_r2w = a_2w/(a_2w + a_2r + c_1r);
@@ -171,6 +171,7 @@ int main(){
             //if s[M] = w
             double beta_1w = b1/(c_2w + b1);
             double gamma_2w = c_2w/(c_2w + b1);
+
 
 
             std::vector<int> mRNA_string;

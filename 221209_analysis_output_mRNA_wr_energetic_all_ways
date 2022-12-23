@@ -1,0 +1,135 @@
+"""
+21-11-22, Muriel Louman, AMOLF
+
+analysis 221121_grow_mRNA_wr_energetic_Jennys_way_test_rates
+"""
+
+#import needed packages
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import math
+import datetime
+import os.path
+
+def date_now(now):
+    year = '{:02d}'.format(now.year)
+    month = f'{now.month}' 
+    day = f'{now.day}' 
+    string_date = year + month + day
+    print(string_date)
+    return string_date
+
+def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, delta_g_tt):
+    plt.plot(length_polymer, error_prob, label = "$\Delta G_{bb}$ = %s, $\Delta G_{tt}$ = %s"%(delta_g_bb, delta_g_tt))
+    plt.title("Energetic: Check when error is equilibrated as function of the length of the mRNA grown for different $\Delta G_{bb}$ and $\Delta G_{tt}$")
+    plt.xlabel("length mRNA")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+def graph_error_g_bb(L_delta_g_bb, L_epsilon, model, delta_g_tt):
+    plt.plot(L_delta_g_bb, L_epsilon, label = "$\Delta G_{tt}$ = %s" %delta_g_tt)
+    plt.title("Energetic: effect $\Delta G_{pol}$ in error of mRNA string, with model %s"%(model))
+    plt.xlabel("$\Delta G_{pol}$")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+def graph_V_G_pol(L_delta_g_bb, L_V, model, delta_g_tt):
+    plt.plot(L_delta_g_bb, L_V, label = "$\Delta G_{tt}$ = %s" %(delta_g_tt))
+    plt.title("Energetic: effect $\Delta G_{pol}$ on how fast the polymer grows, with model =%s"%model)
+    plt.xlabel("$\Delta G_{pol}$")
+    plt.ylabel("V")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+def graph_error_V(L_V, L_epsilon, model, delta_g_tt):
+    plt.plot(L_V, L_epsilon, label = "$\Delta G_{tt}$ = %s" %(delta_g_tt))
+    plt.title("Energetic: effect velocity polymer growth on the error probability, with model = %s"%(model))
+    plt.xlabel("V")
+    plt.ylabel("$\epsilon$")
+    plt.legend(bbox_to_anchor=(1.04, 1))
+    plt.subplots_adjust(right=0.7)
+    return
+
+def forward_backward_categorise(row):
+    if row['monomer added removed'] == '1' or row['monomer added removed'] == '0':
+        return 'f'
+    elif row['monomer added removed'] == 'n':
+        return 'n'
+    return 'b'
+
+def define_V(data):
+    data['f or b'] = data.apply(lambda row: forward_backward_categorise(row), axis=1)
+    series = data['f or b'].value_counts()
+    if 'b' in series:
+        b = data['f or b'].value_counts().b
+    else: 
+        b = 0
+    if 'f' in series:
+        f = data['f or b'].value_counts().f
+    else: 
+        f = 0
+    if 'n' in series:
+        n = data['f or b'].value_counts().n
+    else: 
+        n = 0
+    V = f/(f+b+n)
+    return V
+
+L_delta_g_pol_string = [0,1,2,3,4,5,6,7,8,9,10]
+L_delta_g_pol_label = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+L_delta_g_pol_number = [0,1,2,3,4,5,6,7,8,9,10]
+L_delta_g_tt = [0,2,4,6,8,10]
+
+date = date_now(datetime.datetime.now())
+date = "20221223"
+L_models = ['muriel_big_abs_M2_xdelta_g_tt_pow2']#,'muriel_big_abs_M2_x1'] #["Jenny_full_steps", "muriel_M1_xdelta_g_tt_pow2", "muriel_M1_x1", "muriel_M2_xdelta_g_tt_pow2", "muriel_M2_x1"]
+
+for model in L_models:
+    for delta_g_tt in L_delta_g_tt:
+        L_epsilon = []
+        L_delta_g_bb_graph = []
+        L_velocity = []
+        for i,delta_g_pol in enumerate(L_delta_g_pol_number):                                                          
+            file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221209output/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, L_delta_g_pol_string[i], delta_g_tt))
+            if file_exists == True:
+                data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221209output/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, L_delta_g_pol_string[i], delta_g_tt))
+                epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
+                L_epsilon.append(epsilon)
+                L_delta_g_bb_graph.append(delta_g_pol)
+                # template = data['monomer added removed'][-1:]
+                # data=data.drop(data.index[-1])
+                
+                
+                # # check epsilon geequilibreerd
+                # graph_equilibration_check(data['length polymer'], data['error probability'],L_delta_g_pol_label[i], delta_g_tt)
+
+                #add if it was a forward or backward reaction and calculate v = f/(f+b)
+                # L_velocity.append(define_V(data))
+
+
+            else:
+                print("file does not exist")
+
+        # print(L_delta_g_bb_graph, L_epsilon)
+
+        #define error as all mismatches and plot the error as function of delta G_bb
+        graph_error_g_bb(L_delta_g_bb_graph, L_epsilon, model, delta_g_tt)
+
+        #make V verus G_pol graph
+        # graph_V_G_pol(L_delta_g_bb_graph, L_velocity, model, delta_g_tt)
+
+        #make error verus V graph
+        # graph_error_V(L_velocity, L_epsilon, model, delta_g_tt)
+
+    plt.show()
+
+
+
+
+

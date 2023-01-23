@@ -22,6 +22,12 @@ model you always make a move foward or backward.
 #include <sstream> 
 #include <random> // random number generator
 #include <bits/stdc++.h> //for count function
+
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
+
+// #include <boost/variabels_def.hpp
 using namespace std;
 
 
@@ -104,17 +110,76 @@ string declare_filename(bool all_steps, string DIR, string model_1, int delta_g_
     else if(all_steps == false){
         int step_rounded = round(step);
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
-        filename_output = path + date_now + "model_Jenny_step" + std::to_string(step_rounded) + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
+        filename_output = path + date_now + "model_Jenny_step" + std::to_string(step_rounded) + "_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
     }
     return filename_output;
 }
 
-int main(){
+
+int main(int ac, char* av[]){
     //in main
-    bool all_steps = false;
-    string DIR = "230110output";
+    // bool multiple_DNA = false;
+    // string DIR = "230110output";
     // string x_def = "1"; //"exp"
     // string M_model = "M1"; //"M2"
+    // int number_steps = 0;
+    // bool variables_in_main = false;
+
+    bool multiple_DNA = true;
+    string DIR = "";
+    int number_steps = 0;
+
+    bool variables_in_main = true;
+    if(variables_in_main == true){
+        po::options_description desc("Allowed options");
+        try {
+
+            po::options_description desc("Allowed options");
+            desc.add_options()
+                ("help", "produce help message")
+                ("multiple_DNA", po::value<bool>(), "compute multiple DNA string") //set declaration of values
+                ("DIR", po::value<string>(), "output directory name") 
+                ("number_DNA", po::value<int>(), "number of DNA computed")
+            ;
+            po::variables_map vm;
+            po::store(po::parse_command_line(ac, av, desc), vm);
+            po::notify(vm);
+
+
+
+            if (vm.count("help")) {
+                std::cout << desc << "\n";
+                return 0;}
+            if (vm.count("multiple_DNA")) {
+                std::cout << "we are computing multiple DNA strings: "
+                    << vm["multiple_DNA"].as<bool>() << ".\n"; //print value definition if set
+                multiple_DNA = vm["multiple_DNA"].as<bool>();
+                } 
+            if (vm.count("DIR")) {
+                std::cout << "output file is set to: "
+                    << vm["DIR"].as<string>() << ".\n"; //print value definition if set
+                DIR = vm["DIR"].as<string>();
+                } 
+            if (vm.count("number_DNA")) {
+                std::cout << "number of DNA computed: "
+                    << vm["number_DNA"].as<int>() << ".\n"; //print value definition if set
+                number_steps = vm["number_DNA"].as<int>();
+                }
+            else {
+                std::cout << "Not all variables are set \n";}
+        }
+        catch(exception& e) {
+            cerr << "error: " << e.what() << "\n";
+            return 1;}
+        catch(...) {
+            cerr << "Exception of unknown type!\n";}
+    }
+
+
+
+
+    fstream fss;
+
 
     // define variables
     double k_on = 1.0;
@@ -128,13 +193,12 @@ int main(){
     a_2r = a_1r = a_2w = a_1w = b2 = b1 = c_2r = c_1r = c_2w = c_1w = 0;
     string model_1 = "0";
     double error_prob = 0;
-    int number_steps = 20;
     int x = 0;
     int step = 0;
 
-    double L_delta_g_pol[] = {10};//{0,1,2,3,4,5,6,7,8,9,10}; //we would like to have more but takes computer time
-    double L_delta_g_tt[] = {6};//{0,2,4,6,8,10};
-    int length_mRNA = 300;
+    double L_delta_g_pol[] = {0,1,2,3,4,5,6,7,8,9,10}; //we would like to have more but takes computer time
+    double L_delta_g_tt[] = {0,2,4,6,8,10};
+    int length_mRNA = 3000;
 
     // random number generator for uniform distr between 0 and 1
     std::default_random_engine generator;
@@ -159,11 +223,11 @@ int main(){
             string model_1 ="full_steps";
 
 
-            fstream fss;
+            
             
             //for saving multiple steps end error 
-            if(all_steps == true){
-                string filename = declare_filename(all_steps, DIR, model_1, delta_g_pol, delta_g_tt, step);
+            if(multiple_DNA == true){
+                string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
                 fss.open(filename.c_str(), ios::out | ios::app);
                 // write the file headers
                 fss << "mRNA polymer" << "," << "error probability"  << "\n";
@@ -171,8 +235,8 @@ int main(){
           
             for (step = 0; step <= number_steps; step += 1) {
                 // for saving all moves to make the polymer 
-                if(all_steps == false){
-                    string filename = declare_filename(all_steps, DIR, model_1, delta_g_pol, delta_g_tt, step);
+                if(multiple_DNA == false){
+                    string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
                     fss.open(filename.c_str(), ios::out | ios::app);
                     // write the file headers
                     fss << "monomer added removed" << "," << "length polymer" << "," << "transition state used" <<"," << "error probability"  << "\n";
@@ -330,14 +394,14 @@ int main(){
                 mRNA_moves.transition_state = transition_state_string;
 
                 //save information for every iteration to CSV file  
-                if(all_steps == false){         
+                if(multiple_DNA == false){         
                     fss << mRNA_moves.monomer << "," << mRNA_moves.length <<"," << mRNA_moves.transition_state << ","  << mRNA_moves.error;
                     fss << "\n";
                     }
                 iteration += 1;
                 }
             //save information for every iteration to CSV file 
-            if(all_steps == false){
+            if(multiple_DNA == false){
                 std::vector<int> in = mRNA_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
@@ -347,7 +411,7 @@ int main(){
                 fss.close();
             }
             //save information for one step, only error info
-            if(all_steps == true){
+            if(multiple_DNA == true){
                 std::vector<int> in = mRNA_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
@@ -357,7 +421,7 @@ int main(){
             }
             }
         //save information for all steps, error info
-        if(all_steps == true){
+        if(multiple_DNA == true){
             fss << std ::endl;
             fss.close();
         }

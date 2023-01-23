@@ -20,9 +20,9 @@ def date_now(now):
     print(string_date)
     return string_date
 
-def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, delta_g_tt):
+def graph_equilibration_check(length_polymer, error_prob,delta_g_bb, delta_g_tt, model):
     plt.plot(length_polymer, error_prob, label = "$\Delta G_{bb}$ = %s, $\Delta G_{tt}$ = %s"%(delta_g_bb, delta_g_tt))
-    plt.title("Energetic: Check when error is equilibrated as function of the length of the mRNA grown for different $\Delta G_{bb}$ and $\Delta G_{tt}$")
+    plt.title("Energetic: model: %s, Check when error is equilibrated as function of the length of the mRNA grown for different $\Delta G_{bb}$ and $\Delta G_{tt}$" %model)
     plt.xlabel("length mRNA")
     plt.ylabel("$\epsilon$")
     plt.legend(bbox_to_anchor=(1.04, 1))
@@ -81,25 +81,44 @@ def define_V(data):
     V = f/(f+b+n)
     return V
 
+def make_model_names(x_def, M_model, models, models_lose):
+    L_models = []
+    for x in x_def:
+        for M in M_model:
+            for model in models:
+                model = model + M + "_" + x
+                L_models.append(model)
+    for mod in models_lose:
+        L_models.append(mod)
+    return L_models
+
 L_delta_g_pol_string = [0,1,2,3,4,5,6,7,8,9,10]
 L_delta_g_pol_label = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 L_delta_g_pol_number = [0,1,2,3,4,5,6,7,8,9,10]
-L_delta_g_tt = [0,2,4,6,8,10]
+L_delta_g_tt = [0,1,2,3,4,6,8,10]
 
+models = ["muriel_big_abs_step0_", "no_abs_matrix_step0_", "muriel_step0_"]
+all_steps = False
+DIR = "230110output"
+x_def = ["xdelta_g_tt_pow2", "x1"]
+M_model = ["M1", "M2"]
+# number_steps = 0
+
+L_models = make_model_names(x_def, M_model, models, ["Jenny_step0_full_steps"])
 date = date_now(datetime.datetime.now())
-date = "2023111"
-L_models = ["muriel_big_abs_step0_M1_xdelta_g_tt_pow2","muriel_big_abs_step0_M2_x1", "muriel_big_abs_step0_M2_xdelta_g_tt_pow2", "muriel_big_abs_step0_M1_x1"] #['muriel_big_abs_M2_xdelta_g_tt_pow2','muriel_big_abs_M2_x1'] #["Jenny_full_steps", "muriel_M1_xdelta_g_tt_pow2", "muriel_M1_x1", "muriel_M2_xdelta_g_tt_pow2", "muriel_M2_x1"]
+date = "2023112"
 
 for model in L_models:
     for delta_g_tt in L_delta_g_tt:
         L_epsilon = []
         L_delta_g_bb_graph = []
         L_velocity = []
-        for i,delta_g_pol in enumerate(L_delta_g_pol_number):                                                          
-            file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221209output/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, L_delta_g_pol_string[i], delta_g_tt))
+        for i,delta_g_pol in enumerate(L_delta_g_pol_number):          
+            # print('%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, L_delta_g_pol_string[i], delta_g_tt))                                                
+            file_exists = os.path.exists('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/%s/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(DIR, date, model, L_delta_g_pol_string[i], delta_g_tt))
             if file_exists == True:
-                data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/221209output/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(date, model, L_delta_g_pol_string[i], delta_g_tt))
-                epsilon = data['error probability'].iloc[-50:-1].mean(axis=0)
+                data = pd.read_csv('/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/%s/%smodel_%s_delta_g_pol_%s_delta_g_tt_%s.csv'%(DIR, date, model, L_delta_g_pol_string[i], delta_g_tt))
+                epsilon = data['error probability'].iloc[-2] #.iloc[-50:-1].mean(axis=0)
                 L_epsilon.append(epsilon)
                 L_delta_g_bb_graph.append(delta_g_pol)
                 # template = data['monomer added removed'][-1:]
@@ -107,7 +126,7 @@ for model in L_models:
                 
                 
                 # # check epsilon geequilibreerd
-                # graph_equilibration_check(data['length polymer'], data['error probability'],L_delta_g_pol_label[i], delta_g_tt)
+                # graph_equilibration_check(data['length polymer'], data['error probability'],L_delta_g_pol_label[i], delta_g_tt, model)
 
                 #add if it was a forward or backward reaction and calculate v = f/(f+b)
                 # L_velocity.append(define_V(data))
@@ -128,8 +147,5 @@ for model in L_models:
         # graph_error_V(L_velocity, L_epsilon, model, delta_g_tt)
 
     plt.show()
-
-
-
 
 

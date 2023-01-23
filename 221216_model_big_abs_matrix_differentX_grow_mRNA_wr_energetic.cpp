@@ -22,6 +22,8 @@ states (defined by the rates). Use of a probability to move forward to t1r or t1
 #include <bits/stdc++.h> //for count function
 using namespace std;
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 string date(time_t now){
     tm *ltm = localtime(&now);
@@ -105,12 +107,80 @@ string declare_filename(bool all_steps, string DIR, string model_1, int delta_g_
     return filename_output;
 }
 
-int main(){
+int main(int ac, char* av[]){
     //in main
-    bool all_steps = true;
-    string DIR = "230110output";
-    string x_def = "1"; //"exp"
-    string M_model = "M1"; //"M2"
+    // bool all_steps = false;
+    // string DIR = "230110output";
+    // string x_def = "exp";
+    // string M_model = "M2";
+    // int number_steps = 0;
+    // bool variables_in_main = false;
+
+    bool multiple_DNA = true;
+    string DIR = "";
+    int number_steps = 0;
+    string x_def = "exp";
+    string M_model = "M2";
+
+    bool variables_in_main = true;
+    if(variables_in_main == true){
+        po::options_description desc("Allowed options");
+        try {
+
+            po::options_description desc("Allowed options");
+            desc.add_options()
+                ("help", "produce help message")
+                ("multiple_DNA", po::value<bool>(), "compute multiple DNA string") //set declaration of values
+                ("DIR", po::value<string>(), "output directory name") 
+                ("number_DNA", po::value<int>(), "number of DNA computed")
+                ("x_def", po::value<string>(), "strength x, backbone") 
+                ("M_model", po::value<string>(), "rate definition M1(backward correction) or M2(forward correction)") 
+            ;
+            po::variables_map vm;
+            po::store(po::parse_command_line(ac, av, desc), vm);
+            po::notify(vm);
+
+
+
+            if (vm.count("help")) {
+                std::cout << desc << "\n";
+                return 0;}
+            if (vm.count("multiple_DNA")) {
+                std::cout << "we are computing multiple DNA strings: "
+                    << vm["multiple_DNA"].as<bool>() << ".\n"; //print value definition if set
+                multiple_DNA = vm["multiple_DNA"].as<bool>();
+                } 
+            if (vm.count("DIR")) {
+                std::cout << "output file is set to: "
+                    << vm["DIR"].as<string>() << ".\n"; //print value definition if set
+                DIR = vm["DIR"].as<string>();
+                } 
+            if (vm.count("number_DNA")) {
+                std::cout << "number of DNA computed: "
+                    << vm["number_DNA"].as<int>() << ".\n"; //print value definition if set
+                number_steps = vm["number_DNA"].as<int>();
+                }
+            if (vm.count("x_def")) {
+                std::cout << "x value: "
+                    << vm["x_def"].as<string>() << ".\n"; //print value definition if set
+                x_def = vm["x_def"].as<string>();
+                }
+            if (vm.count("M_model")) {
+                std::cout << "M model: "
+                    << vm["M_model"].as<string>() << ".\n"; //print value definition if set
+                M_model = vm["M_model"].as<string>();
+                }
+            else {
+                std::cout << "Not all variables are set \n";}
+        }
+        catch(exception& e) {
+            cerr << "error: " << e.what() << "\n";
+            return 1;}
+        catch(...) {
+            cerr << "Exception of unknown type!\n";}
+    }
+
+
 
     // define variables
     double k_on = 1.0;
@@ -122,20 +192,22 @@ int main(){
 
     double a_2r, a_1r, a_2w, a_1w, b2, b1, c_2r, c_1r, c_2w, c_1w;
     a_2r = a_1r = a_2w = a_1w = b2 = b1 = c_2r = c_1r = c_2w = c_1w = 0;
-    string model_1 = "0";
+
+    string model_1 = "";
     double error_prob = 0;
-    int number_steps = 20;
-    int x = 0;
+    double x = 0;
     int step = 0;
+    string x_string = "";
+    __float128 aa = 0;
 
     // random number generator for uniform distr between 0 and 1
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0,1.0);
 
     //for making the error landscape defined by different delta G_tt and delta G_pol
-    double L_delta_g_tt[] = {6};//{0,2,4,6,8,10};
-    double L_delta_g_pol[] = {10};//{0,1,2,3,4,5,6,7,8,9,10};
-    int length_mRNA = 300;
+    double L_delta_g_tt[] = {0,1,2,3,4};//{0,2,4,6,8,10};
+    double L_delta_g_pol[] = {0,1,2,3,4,5,6,7,8,9,10};
+    int length_mRNA = 3000;
        
     
     //loop over different g_tt and g_bb
@@ -144,17 +216,21 @@ int main(){
             
             if(x_def =="exp"){
                 x = exp(pow(delta_g_tt,2));
-                string x_string = "delta_g_tt_pow2";}
+                x_string = "delta_g_tt_pow2";
+                aa = 1;}
             else if(x_def == "1"){
-                x = 1;}
+                x = 1;
+                int rounded_x = round(x);
+                x_string = std::to_string(rounded_x);
+                aa = 1;}
 
             int y = 1;         
-            int rounded_x = round(x);
             int rounded_y = round(y);
-            string x_string = std::to_string(rounded_x);
+            
             
             if (M_model == "M1"){
             a_2r = a_1r = a_2w = 1;
+            a_1w = exp(delta_g_tt);
             b2 = x;
             b1 = x * exp(-delta_g_pol);
             c_2r = c_1r = c_2w = y;
@@ -177,8 +253,8 @@ int main(){
             
             
             // for saving multiple steps end error 
-            if(all_steps == true){
-                string filename = declare_filename(all_steps, DIR, model_1, delta_g_pol, delta_g_tt, step);
+            if(multiple_DNA == true){
+                string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
                 fss.open(filename.c_str(), ios::out | ios::app);
                 // write the file headers
                 fss << "mRNA polymer" << "," << "error probability"  << "\n";
@@ -186,8 +262,8 @@ int main(){
     
             for (step = 0; step <= number_steps; step += 1) {
                 // for saving all moves to make the polymer 
-                if(all_steps == false){
-                    string filename = declare_filename(all_steps, DIR, model_1, delta_g_pol, delta_g_tt, step);
+                if(multiple_DNA == false){
+                    string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
                     fss.open(filename.c_str(), ios::out | ios::app);
                     // write the file headers
                     fss << "monomer added removed" << "," << "length polymer" << "," << "transition state used" <<"," << "error probability"  << "\n";
@@ -201,13 +277,14 @@ int main(){
                 int iteration = 0;
                 string transition_state_string = "t";
                 string monomer_status = "0";   
+                int monomer_adding = 0;
 
                 while (mRNA_string.size()<length_mRNA){
                     // Go to transition state 1r or 1w or 2, first MC step
                     // create a random number betwen 0 and 1
                     int Q = mRNA_string.size() -1;
 
-                    
+
                     // define the variables used in the absorption matrix
                     if (mRNA_string[Q] == 0){
                         G = alpha_1(b2, a_1r);
@@ -266,11 +343,16 @@ int main(){
                             L = alpha_2(a_2r, a_2w, c_1w, a_2w);
                         }
                     }
-
-                    double Z = (1 - B*C - D*E - F*G + B*C*F*G - H*I + B*C*H*I + D*E*H*I - L*M + B*C*L*M + H*I*L*M - B*C*H*I*L*M - N*O + B*C*N*O + D*E*N*O + F*G*N*O - B*C*F*G*N*O + H*I*N*O - B*C*H*I*N*O - D*E*H*I*N*O);
-                    double backward = (A*(C*E -C*E*H*I - C*E*N*O + C*E*H*I*N*O))/Z;
-                    double forward_r = (J*(F*H - B*C*F*H - F*H*N*O + B*C*F*H*N*O))/Z;
-                    double forward_w = (P*(L*N - B*C*L*N - H*I*L*N + B*C*H*I*L*N))/Z;
+                    
+                    
+                    __float128 Z = aa*(1 - B*C - D*E - F*G + B*C*F*G - H*I + B*C*H*I + D*E*H*I - L*M + B*C*L*M + H*I*L*M - B*C*H*I*L*M - N*O + B*C*N*O + D*E*N*O + F*G*N*O - B*C*F*G*N*O + H*I*N*O - B*C*H*I*N*O - D*E*H*I*N*O);
+                    __float128 pp11=C*E;
+                    __float128 pp22=-C*E*H*I;
+                    __float128 pp33=- C*E*N*O;
+                    __float128 pp44=C*E*H*I*N*O;
+                    __float128 backward = aa*(A*(C*E -C*E*H*I - C*E*N*O + C*E*H*I*N*O))/Z; 
+                    __float128 forward_r = aa*(J*(F*H - B*C*F*H - F*H*N*O + B*C*F*H*N*O))/Z; 
+                    __float128 forward_w = aa*(P*(L*N - B*C*L*N - H*I*L*N + B*C*H*I*L*N))/Z; 
                     double random_number1 = distribution(generator);   
                     if (mRNA_string.size() ==2){
                         double P_forward_r = forward_r /(forward_r + forward_w);
@@ -309,7 +391,7 @@ int main(){
                 mRNA_moves.transition_state = transition_state_string;
 
                 //save information for every iteration to CSV file  
-                if(all_steps == false){         
+                if(multiple_DNA == false){         
                     fss << mRNA_moves.monomer << "," << mRNA_moves.length <<"," << mRNA_moves.transition_state << ","  << mRNA_moves.error;
                     fss << "\n";
                     }
@@ -318,7 +400,7 @@ int main(){
                 }
 
             //save information for every iteration to CSV file 
-            if(all_steps == false){
+            if(multiple_DNA == false){
                 std::vector<int> in = mRNA_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
@@ -329,7 +411,7 @@ int main(){
             }
 
             //save information for one step, only error info
-            if(all_steps == true){
+            if(multiple_DNA == true){
                 std::vector<int> in = mRNA_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
@@ -340,7 +422,7 @@ int main(){
             
             }
         //save information for all steps, error info
-        if(all_steps == true){
+        if(multiple_DNA == true){
             fss << std ::endl;
             fss.close();
         }

@@ -1,0 +1,15 @@
+--multiple_DNA=true.
+--DIR=230518_equi_output.
+--number_DNA=100.
+--x_def=1.
+--mRNA_length=300.
+--L_g_pol=3000 0 .
+--ratio_template=1 1 1 1 1 1 .
+--purine_1=A.
+--purine_2=G.
+--purine_3=Lambda.
+--pyrimidines_1=T.
+--pyrimidines_2=C.
+--pyrimidines_3=Sigma.
+--repulsion_11_00=4.
+

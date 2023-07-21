@@ -109,121 +109,20 @@ string declare_filename_parameter(bool all_steps, string DIR, string M_model, st
     return filename_output;
 }
 
-int main(int ac, char* av[]){
+int main(){
     //in main
-    // bool all_steps = true;
-    // bool multiple_DNA = true;
-    // string DIR = "test_output";
-    // string x_def = "exp";
-    // string M_model = "M1"; //"M2"
-    // int number_steps = 50;
-    // bool variables_in_main = false;
-    // int length_mRNA = 50;
-    // vector<double> L_delta_g_tt;
-    // vector<double> L_delta_g_pol;
-
+    bool all_steps = true;
     bool multiple_DNA = true;
-    string DIR = "";
-    int number_steps = 0;
+    string DIR = "test_output";
     string x_def = "exp";
-    string M_model = "M2";
-    int length_mRNA = 1;
-    vector<double> L_delta_g_tt;
-    vector<double> L_delta_g_pol;
-    bool variables_in_main = true;
-    if(variables_in_main == true){
-        
-        po::options_description desc("Allowed options");
-        try {
-
-            po::options_description desc("Allowed options");
-            desc.add_options()
-                ("help", "produce help message")
-                ("multiple_DNA", po::value<bool>(), "compute multiple DNA string") //set declaration of values
-                ("DIR", po::value<string>(), "output directory name") 
-                ("number_DNA", po::value<int>(), "number of DNA computed")
-                ("x_def", po::value<string>(), "strength x, backbone") 
-                ("M_model", po::value<string>(), "rate definition M1(backward correction) or M2(forward correction)") 
-                ("mRNA_length", po::value<int>(), "length of the mRNA string formed")
-                ("L_g_pol", po::value< vector<double> >(), "delta G_pol definitions list") 
-                ("L_g_tt", po::value< vector<double> >(), "delta G_tt definitions list") 
-            ;
-            po::variables_map vm;
-            po::store(po::parse_command_line(ac, av, desc), vm);
-            po::notify(vm);
-
-	        std::cout << "--multiple_DNA=" << vm["multiple_DNA"].as<bool>() << ".\n" ;
-            std::cout << "--DIR=" << vm["DIR"].as<string>() << ".\n";
-            std::cout << "--number_DNA=" << vm["number_DNA"].as<int>() << ".\n";
-            std::cout << "--x_def=" << vm["x_def"].as<string>() << ".\n";
-            std::cout << "--M_model=" << vm["M_model"].as<string>() << ".\n";
-            std::cout << "--mRNA_length=" << vm["mRNA_length"].as<int>() << ".\n";
-            std::cout << "--L_g_pol=";
-            print_matrix_double(vm["L_g_pol"].as< vector<double> >()) ;
-            std::cout <<".\n"  ;
-            std::cout << "--L_g_tt=";
-            print_matrix_double(vm["L_g_tt"].as< vector<double> >());
-            std::cout << ".\n";
-            std::cout << "\n";	
-            std::cout << "model used: Muriel. \n";   
+    string M_model = "M1"; //"M2"
+    int number_steps = 100;
+    int length_mRNA = 100;
+    vector<double> L_delta_g_tt = {0,2,4,6,8,10};
+    vector<double> L_delta_g_pol = {0,1,2,3,4,5,6,7,8,9,10};
 
 
-
-            if (vm.count("help")) {
-                std::cout << desc << "\n";
-                return 0;}
-            if (vm.count("multiple_DNA")) {
-                std::cout << "we are computing multiple DNA strings: "
-                    << vm["multiple_DNA"].as<bool>() << ".\n"; //print value definition if set
-                multiple_DNA = vm["multiple_DNA"].as<bool>();
-                } 
-            if (vm.count("DIR")) {
-                std::cout << "output file is set to: "
-                    << vm["DIR"].as<string>() << ".\n"; //print value definition if set
-                DIR = vm["DIR"].as<string>();
-                } 
-            if (vm.count("number_DNA")) {
-                std::cout << "number of DNA computed: "
-                    << vm["number_DNA"].as<int>() << ".\n"; //print value definition if set
-                number_steps = vm["number_DNA"].as<int>();
-                }
-            if (vm.count("x_def")) {
-                std::cout << "x value: "
-                    << vm["x_def"].as<string>() << ".\n"; //print value definition if set
-                x_def = vm["x_def"].as<string>();
-                }
-            if (vm.count("M_model")) {
-                std::cout << "M model: "
-                    << vm["M_model"].as<string>() << ".\n"; //print value definition if set
-                M_model = vm["M_model"].as<string>();
-                }
-            if (vm.count("mRNA_length")) {
-                std::cout << "length of the mRNA formed: "
-                    << vm["mRNA_length"].as<int>() << ".\n"; //print value definition if set
-                length_mRNA = vm["mRNA_length"].as<int>();
-                }
-            if (vm.count("L_g_pol")){
-                std::cout << "delta G_pol list definition: " ;
-                print_matrix_double(vm["L_g_pol"].as< vector<double> >());
-                std::cout << ".\n";
-                L_delta_g_pol = vm["L_g_pol"].as< vector<double> >();
-            }
-            if (vm.count("L_g_tt")){
-                std::cout << "delta G_tt list definition: " ;
-                print_matrix_double(vm["L_g_tt"].as< vector<double> >());
-                std::cout << ".\n";
-                L_delta_g_tt = vm["L_g_tt"].as< vector<double> >();
-            }
-            else {
-                std::cout << "Not all variables are set \n";}
-            
-        }
-        catch(exception& e) {
-            cerr << "error: " << e.what() << "\n";
-            return 1;}
-        catch(...) {
-            cerr << "Exception of unknown type!\n";}
-    }
+    
 fstream fss;
     string parameter_output_file = declare_filename_parameter(multiple_DNA, DIR, M_model, x_def);
     fss.open(parameter_output_file.c_str(), ios::out | ios::app);
@@ -264,6 +163,7 @@ fstream fss;
     string model_1 = "0";
     double error_prob = 0;
     double x = 0;
+    int x1= 0;
     int step = 0;
     string x_string = "";
 
@@ -284,9 +184,15 @@ fstream fss;
         for (double delta_g_tt : L_delta_g_tt){
             // define rates 
             if(x_def =="exp"){
+                // x = exp(delta_g_tt + 4);
+                // x = exp(delta_g_tt + 20);
+                // x1 = exp(delta_g_tt + 20);
                 x = exp(delta_g_tt + 5);
-                // x = exp(pow(delta_g_tt,2));
-                x_string = "exp5";}
+                std::cout << x << std::endl;
+                std::cout << x1 << std::endl;
+                // x = x1;
+                
+                x_string = "delta_g_tt_pow2";}
             else if(x_def == "1"){
                 x = 1;
                 int rounded_x = round(x);

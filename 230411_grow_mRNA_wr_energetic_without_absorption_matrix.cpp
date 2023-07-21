@@ -79,7 +79,7 @@ void print_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess){
 
 
 
-string declare_filename(bool all_steps, string DIR, string model_1, double delta_g_pol, double delta_g_tt, int step){
+string declare_filename(bool all_steps, string DIR, string model_1, double delta_g_pol, double delta_g_tt, int step, string length){
     string date_now = date(time(0));
     int rounded_delta_g_pol = round(delta_g_pol);
     string str_rounded_delta_g_pol = std::to_string(rounded_delta_g_pol);
@@ -90,7 +90,7 @@ string declare_filename(bool all_steps, string DIR, string model_1, double delta
     string filename_output = "";
     if(all_steps ==true){
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
-        filename_output = path + date_now + "model_no_abs_matrix_" + model_1 + "_delta_g_pol_" + str_rounded_delta_g_pol + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + "_allsteps.csv";
+        filename_output = path + date_now + "model_no_abs_matrix_" + model_1 + "_delta_g_pol_" + str_rounded_delta_g_pol + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + "length_copy" + length +"_allsteps.csv";
     }
     else if(all_steps == false){
         int step_rounded = round(step);
@@ -100,12 +100,12 @@ string declare_filename(bool all_steps, string DIR, string model_1, double delta
     return filename_output;
 }
 
-string declare_filename_parameter(bool all_steps, string DIR, string M_model, string x_def){
+string declare_filename_parameter(bool all_steps, string DIR, string M_model, string x_def, string length){
     string date_now = date(time(0));
     string filename_output = "";
     string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
     if(all_steps ==true){
-        filename_output = path + date_now + "parameter_file_model_no_abs_" + M_model + "_x" + x_def + "_allsteps.csv";}
+        filename_output = path + date_now + "parameter_file_model_no_abs_" + M_model + "_x" + x_def + "length_copy" + length +"_allsteps.csv";}
     else{
         filename_output = path + date_now + "parameter_file_model_no_abs_" + M_model + "_x" + x_def + "_seperate_steps.csv";}
      
@@ -114,12 +114,15 @@ string declare_filename_parameter(bool all_steps, string DIR, string M_model, st
 
 
 int main(int ac, char* av[]){
-    //in main
-    // bool all_steps = false;
-    // string DIR = "230110output";
-    // string x_def = "1"; //"exp"
-    // string M_model = "M1"; //"M2"
-    // int number_steps = 0;
+    // in main
+    // bool multiple_DNA=true;
+    // string DIR ="test_output";
+    // int number_steps =200;
+    // string x_def= "exp";
+    // string M_model= "MB2";
+    // int length_mRNA=15;
+    // vector<double> L_delta_g_pol = {3000,0};
+    // vector<double> L_delta_g_tt={0, 2, 4, 6};
     // bool variables_in_main = false;
 
     bool multiple_DNA = true;
@@ -223,9 +226,9 @@ int main(int ac, char* av[]){
         catch(...) {
             cerr << "Exception of unknown type!\n";}
     }
-    
+    string length_str = std::to_string(length_mRNA);
     fstream fss;
-    string parameter_output_file = declare_filename_parameter(multiple_DNA, DIR, M_model, x_def);
+    string parameter_output_file = declare_filename_parameter(multiple_DNA, DIR, M_model, x_def,length_str);
     fss.open(parameter_output_file.c_str(), ios::out | ios::app);
     fss << "--multiple_DNA=" << multiple_DNA << ".\n" ;
     fss << "--DIR=" << DIR << ".\n";
@@ -308,23 +311,42 @@ int main(int ac, char* av[]){
             int y = 1;         
             int rounded_y = round(y);
             
-            if (M_model == "M1"){
+            if (M_model == "MF1"){
+            a_2r = a_1r = a_1w = 1;
+            a_2w = exp(-delta_g_tt);
+            b2 = x;
+            b1 = x * exp(-delta_g_pol);
+            c_2r = c_1r = c_2w = y;
+            c_1w = y * exp(-delta_g_tt);
+            model_1 = "MF1_x" + x_string;}
+            
+            if (M_model == "MF2"){
+            a_2r = a_1r = a_1w = 1;
+            a_2w = exp(-delta_g_tt);
+            b2 = x;
+            b1 = x * exp(-delta_g_pol);
+            c_2r = c_1r = c_1w = y;
+            c_2w = y * exp(delta_g_tt);
+            model_1 = "MF2_x" + x_string;}
+
+            if (M_model == "MB1"){
             a_2r = a_1r = a_2w = 1;
             a_1w = exp(delta_g_tt);
             b2 = x;
             b1 = x * exp(-delta_g_pol);
             c_2r = c_1r = c_2w = y;
             c_1w = y * exp(-delta_g_tt);
-            model_1 = "M1_x" + x_string;}
+            model_1 = "MB1_x" + x_string;}
             
-            if (M_model == "M2"){
+            if (M_model == "MB2"){
             a_2r = a_1r = a_2w = 1;
             a_1w = exp(delta_g_tt);
             b2 = x;
             b1 = x * exp(-delta_g_pol);
             c_2r = c_1r = c_1w = y;
             c_2w = y * exp(delta_g_tt);
-            model_1 = "M2_x" + x_string;}
+            model_1 = "MB2_x" + x_string;}
+
 
             // define probabilities 
             //if s[M-1] = r
@@ -351,7 +373,7 @@ int main(int ac, char* av[]){
             fstream fss;
             //for saving multiple steps end error 
             if(multiple_DNA == true){
-                string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
+                string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step,length_str);
                 fss.open(filename.c_str(), ios::out | ios::app);
                 // write the file headers
                 fss << "mRNA polymer" << "," << "error probability"  << "\n";
@@ -360,7 +382,7 @@ int main(int ac, char* av[]){
             for (step = 0; step <= number_steps; step += 1) {
                 // for saving all moves to make the polymer 
                 if(multiple_DNA == false){
-                    string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step);
+                    string filename = declare_filename(multiple_DNA, DIR, model_1, delta_g_pol, delta_g_tt, step, length_str);
                     fss.open(filename.c_str(), ios::out | ios::app);
                     // write the file headers
                     fss << "monomer added removed" << "," << "length polymer" << "," << "transition state used" <<"," << "error probability"  << "\n";
@@ -589,12 +611,13 @@ int main(int ac, char* av[]){
 
             //save information for one step, only error info
             if(multiple_DNA == true){
+                error_prob = count(mRNA_string.begin() +1, mRNA_string.end(), 1)/((double)mRNA_string.size()-1);
                 std::vector<int> in = mRNA_string;
                 // loop through the array elements
                 for(int j=0; j< in.size(); ++j){
                     fss << in.at(j) ;
                     }
-                fss << "," << mRNA_moves.error << "\n";
+                fss << "," << error_prob << "\n";
             }
             
             }

@@ -68,6 +68,15 @@ void print_matrix(std::vector<int> input){
         }
 }
 
+void print_matrix_double(std::vector<double> input){
+    int n = sizeof(input)/sizeof(input[0]);
+ 
+    // loop through the array elements
+    for(int i=0; i< input.size(); ++i){
+        std::cout << input.at(i) << ' ';
+        }
+}
+
 void print_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess){
     // loop through the array elements, which are all structures defined by structure_mRNA_move
     for(int i=0; i< mRNA_movess.size(); ++i){
@@ -98,20 +107,36 @@ void save_matrix_of_structures(std::vector<structure_mRNA_move> mRNA_movess, std
     fss.close();
 }
 
-string declare_filename(bool all_steps, string DIR, string model_1, int delta_g_pol, int delta_g_tt, int step){
+string declare_filename(bool all_steps, string DIR, string model_1, double delta_g_pol, double delta_g_tt, int step){
     string date_now = date(time(0));
     int rounded_delta_g_pol = round(delta_g_pol);
+    string str_rounded_delta_g_pol = std::to_string(rounded_delta_g_pol);
+    if(delta_g_pol == -log(2)){
+        str_rounded_delta_g_pol = "-ln2";
+    }
     int rounded_delta_g_tt = round(delta_g_tt);
     string filename_output = "";
     if(all_steps ==true){
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
-        filename_output = path + date_now + "model_Jenny_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + "_allsteps.csv";
+        filename_output = path + date_now + "model_Jenny_" + model_1 + "_delta_g_pol_" + str_rounded_delta_g_pol + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + "_allsteps.csv";
     }
     else if(all_steps == false){
         int step_rounded = round(step);
         string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
-        filename_output = path + date_now + "model_Jenny_step" + std::to_string(step_rounded) + "_" + model_1 + "_delta_g_pol_" + std::to_string(rounded_delta_g_pol) + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
+        filename_output = path + date_now + "model_Jenny_step" + std::to_string(step_rounded) + "_" + model_1 + "_delta_g_pol_" + str_rounded_delta_g_pol + "_delta_g_tt_" + std::to_string(rounded_delta_g_tt) + ".csv";
     }
+    return filename_output;
+}
+
+string declare_filename_parameter(bool all_steps, string DIR, string M_model, string x_def){
+    string date_now = date(time(0));
+    string filename_output = "";
+    string path = "/home/ipausers/louman/Documents/programming/DNA_replication_muriel/outs/" + DIR + "/";
+    if(all_steps ==true){
+        filename_output = path + date_now + "parameter_file_model_jenny_" + M_model + "_x" + x_def + "_allsteps.csv";}
+    else{
+        filename_output = path + date_now + "parameter_file_model_jenny_" + M_model + "_x" + x_def + "_seperate_steps.csv";}
+     
     return filename_output;
 }
 
@@ -128,6 +153,11 @@ int main(int ac, char* av[]){
     bool multiple_DNA = true;
     string DIR = "";
     int number_steps = 0;
+    int length_mRNA = 1;
+    string x_def = "n";
+    string M_model = "n";
+    vector<double> L_delta_g_tt;
+    vector<double> L_delta_g_pol;
 
     bool variables_in_main = true;
     if(variables_in_main == true){
@@ -140,11 +170,30 @@ int main(int ac, char* av[]){
                 ("multiple_DNA", po::value<bool>(), "compute multiple DNA string") //set declaration of values
                 ("DIR", po::value<string>(), "output directory name") 
                 ("number_DNA", po::value<int>(), "number of DNA computed")
+                ("x_def", po::value<string>(), "strength x, backbone") 
+                ("M_model", po::value<string>(), "rate definition M1(backward correction) or M2(forward correction)") 
+                ("mRNA_length", po::value<int>(), "length of the mRNA string formed")
+                ("L_g_pol", po::value< vector<double> >(), "delta G_pol definitions list") 
+                ("L_g_tt", po::value< vector<double> >(), "delta G_tt definitions list")
             ;
             po::variables_map vm;
             po::store(po::parse_command_line(ac, av, desc), vm);
             po::notify(vm);
 
+            std::cout << "--multiple_DNA=" << vm["multiple_DNA"].as<bool>() << ".\n" ;
+            std::cout << "--DIR=" << vm["DIR"].as<string>() << ".\n";
+            std::cout << "--number_DNA=" << vm["number_DNA"].as<int>() << ".\n";
+            std::cout << "--x_def=" << vm["x_def"].as<string>() << ".\n";
+            std::cout << "--M_model=" << vm["M_model"].as<string>() << ".\n";
+            std::cout << "--mRNA_length=" << vm["mRNA_length"].as<int>() << ".\n";
+            std::cout << "--L_g_pol=";
+            print_matrix_double(vm["L_g_pol"].as< vector<double> >()) ;
+            std::cout <<".\n"  ;
+            std::cout << "--L_g_tt="; 
+            print_matrix_double(vm["L_g_tt"].as< vector<double> >());
+            std::cout << ".\n";
+            std::cout << "\n";
+            std::cout << "model used: Jenny. \n";
 
 
             if (vm.count("help")) {
@@ -165,9 +214,41 @@ int main(int ac, char* av[]){
                     << vm["number_DNA"].as<int>() << ".\n"; //print value definition if set
                 number_steps = vm["number_DNA"].as<int>();
                 }
+            if (vm.count("x_def")) {
+                std::cout << "x value: "
+                    << vm["x_def"].as<string>() << ".\n"; //print value definition if set
+                x_def = vm["x_def"].as<string>();
+                }
+            if (vm.count("M_model")) {
+                std::cout << "M model: "
+                    << vm["M_model"].as<string>() << ".\n"; //print value definition if set
+                M_model = vm["M_model"].as<string>();
+                }
+            if (vm.count("mRNA_length")) {
+                std::cout << "length of the mRNA formed: "
+                    << vm["mRNA_length"].as<int>() << ".\n"; //print value definition if set
+                length_mRNA = vm["mRNA_length"].as<int>();
+                }
+            if (vm.count("L_g_pol")){
+                std::cout << "delta G_pol list definition: " ;
+                print_matrix_double(vm["L_g_pol"].as< vector<double> >());
+                std::cout << ".\n";
+                L_delta_g_pol = vm["L_g_pol"].as< vector<double> >();
+            }
+            if (vm.count("L_g_tt")){
+                std::cout << "delta G_tt list definition: " ;
+                print_matrix_double(vm["L_g_tt"].as< vector<double> >());
+                std::cout << ".\n";
+                L_delta_g_tt = vm["L_g_tt"].as< vector<double> >();
+            }
             else {
                 std::cout << "Not all variables are set \n";}
+            
+            
         }
+        
+
+
         catch(exception& e) {
             cerr << "error: " << e.what() << "\n";
             return 1;}
@@ -179,7 +260,31 @@ int main(int ac, char* av[]){
 
 
     fstream fss;
-
+    string parameter_output_file = declare_filename_parameter(multiple_DNA, DIR, M_model, x_def);
+    fss.open(parameter_output_file.c_str(), ios::out | ios::app);
+    fss << "--multiple_DNA=" << multiple_DNA << ".\n" ;
+    fss << "--DIR=" << DIR << ".\n";
+    fss << "--number_DNA=" << number_steps << ".\n";
+    fss << "--x_def=" << x_def << ".\n";
+    fss << "--M_model=" << M_model << ".\n";
+    fss << "--mRNA_length=" << length_mRNA << ".\n";
+    fss << "--L_g_pol=";
+    std::vector<double> in = L_delta_g_pol;
+    // loop through the array elements
+    for(int j=0; j< in.size(); ++j){
+        fss << in.at(j);
+        fss << " ";}
+    fss <<".\n"  ;
+    fss << "--L_g_tt=";
+    std::vector<double> inn = L_delta_g_tt;
+    // loop through the array elements
+    for(int j=0; j< inn.size(); ++j){
+        fss << inn.at(j);
+        fss << " ";}       
+    fss << ".\n";
+    fss << "\n";
+    fss << "model used: Jenny.\n";   
+    fss.close();
 
     // define variables
     double k_on = 1.0;
@@ -193,12 +298,12 @@ int main(int ac, char* av[]){
     a_2r = a_1r = a_2w = a_1w = b2 = b1 = c_2r = c_1r = c_2w = c_1w = 0;
     string model_1 = "0";
     double error_prob = 0;
-    int x = 0;
+    double x = 0;
     int step = 0;
 
-    double L_delta_g_pol[] = {0,1,2,3,4,5,6,7,8,9,10}; //we would like to have more but takes computer time
-    double L_delta_g_tt[] = {0,2,4,6,8,10};
-    int length_mRNA = 3000;
+    // double L_delta_g_pol[] = {0,1,2,3,4,5,6,7,8,9,10}; //we would like to have more but takes computer time
+    // double L_delta_g_tt[] = {0,2,4,6,8,10};
+    // int length_mRNA = 3000;
 
     // random number generator for uniform distr between 0 and 1
     std::default_random_engine generator;
@@ -211,7 +316,11 @@ int main(int ac, char* av[]){
 
     //loop over different g_tt and g_bb
     for (double delta_g_pol : L_delta_g_pol) {
+        if(delta_g_pol == 3000){
+                delta_g_pol = -log(2);
+        }
         for (double delta_g_tt : L_delta_g_tt) {
+            
             
             //define rates for moving forward or backward
             double psi_rr_plus, psi_rw_plus, psi_ww_plus, psi_wr_plus; 
@@ -222,7 +331,7 @@ int main(int ac, char* av[]){
             double psi_wr_min = exp(-delta_g_pol-delta_g_tt);
             string model_1 ="full_steps";
 
-
+            
             
             
             //for saving multiple steps end error 

@@ -1,0 +1,14 @@
+--multiple_DNA=true.
+--DIR=230517output.
+--number_DNA=100.
+--x_def=1.
+--mRNA_length=300.
+--L_g_pol=0 1 2 3 4 5 6 7 8 9 10 .
+--ratio_template=1 1 1 1 .
+--purine_1=A.
+--purine_2=X.
+--pyrimidines_1=T.
+--pyrimidines_2=K.
+--repulsion_11_00=20.
+
+

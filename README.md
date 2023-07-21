@@ -109,6 +109,10 @@ Paramaters:
     
     `int repulsion_00_11`; = ("repulsion_11_00", po::value<int>(), "strength repulsion purine-pruine or pyrimidine-pyrimidine binding") --> \Delta G_{cost}
 
+### 230501_Big_abs_BF_x1_4differentbases_with_pupu_pypy_editcost
+
+4 nucleotide system of polymer copying putting the cost on b+ 
+
 
 ### 230630_limit_G_bb_abs_matrix_6_bases.py
 
@@ -141,7 +145,7 @@ absoption matrix of system of 6 bases in the limit of inifite backbone strength 
 ### mathematica/230714_absoption_matrix_xexp_simplified_system.nv               
 Absorption matrix of system chapter 2 in the limit of infinite backbone strength((figure 12 of thesis) with x can be varied
 
-                
+### all other codes are old or not working correctly!              
                 
                
                 
